@@ -1,230 +1,254 @@
-import * as React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
 
-import { styled, alpha } from "@mui/material/styles";
-import AppBar from "@mui/material/AppBar";
+import PropTypes from "prop-types";
+
 import Box from "@mui/material/Box";
+import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import Menu from "@mui/material/Menu";
-import MenuIcon from "@mui/icons-material/Menu";
-import Container from "@mui/material/Container";
-import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
-import Tooltip from "@mui/material/Tooltip";
+import Container from "@mui/material/Container";
+import Divider from "@mui/material/Divider";
+import Typography from "@mui/material/Typography";
 import MenuItem from "@mui/material/MenuItem";
-import AdbIcon from "@mui/icons-material/Adb";
-import SearchIcon from "@mui/icons-material/Search";
-import InputBase from "@mui/material/InputBase";
+import Drawer from "@mui/material/Drawer";
+import MenuIcon from "@mui/icons-material/Menu";
+import ToggleColorMode from "../../shared/components/ToggleColorMode";
 
-const pages = ["Products", "Pricing", "Blog"];
-const settings = ["Profile", "Account", "Dashboard", "Logout"];
+const logoStyle = {
+  width: "140px",
+  height: "auto",
+  cursor: "pointer",
+};
 
-const Search = styled("div")(({ theme }) => ({
-  position: "relative",
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
-  "&:hover": {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
-  },
-  marginLeft: 0,
-  width: "100%",
-  [theme.breakpoints.up("sm")]: {
-    marginLeft: theme.spacing(1),
-    width: "auto",
-  },
-}));
+const AppAppBar = ({ mode, toggleColorMode }) => {
+  const [open, setOpen] = useState(false);
 
-const SearchIconWrapper = styled("div")(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: "100%",
-  position: "absolute",
-  pointerEvents: "none",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: "inherit",
-  width: "100%",
-  "& .MuiInputBase-input": {
-    padding: theme.spacing(1, 1, 1, 0),
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create("width"),
-    [theme.breakpoints.up("sm")]: {
-      width: "12ch",
-      "&:focus": {
-        width: "20ch",
-      },
-    },
-  },
-}));
-
-const NavBar = () => {
-  const [anchorElNav, setAnchorElNav] = React.useState(null);
-  const [anchorElUser, setAnchorElUser] = React.useState(null);
-
-  const handleOpenNavMenu = (event) => {
-    setAnchorElNav(event.currentTarget);
+  const toggleDrawer = (newOpen) => () => {
+    setOpen(newOpen);
   };
 
-  const handleOpenUserMenu = (event) => {
-    setAnchorElUser(event.currentTarget);
-  };
-
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
-  };
-
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
+  const scrollToSection = (sectionId) => {
+    const sectionElement = document.getElementById(sectionId);
+    const offset = 128;
+    if (sectionElement) {
+      const targetScroll = sectionElement.offsetTop - offset;
+      sectionElement.scrollIntoView({ behavior: "smooth" });
+      window.scrollTo({
+        top: targetScroll,
+        behavior: "smooth",
+      });
+      setOpen(false);
+    }
   };
 
   return (
-    <AppBar position="static">
-      <Container maxWidth="xl">
-        <Toolbar disableGutters>
-          <AdbIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
-          <Typography
-            variant="h6"
-            noWrap
-            component="a"
-            href="/"
-            sx={{
-              mr: 2,
-              display: { xs: "none", md: "flex" },
-              fontFamily: "monospace",
-              fontWeight: 700,
-              letterSpacing: ".3rem",
-              color: "inherit",
-              textDecoration: "none",
-            }}
+    <div>
+      <AppBar
+        position="fixed"
+        sx={{
+          boxShadow: 0,
+          bgcolor: "transparent",
+          backgroundImage: "none",
+          mt: 2,
+          fontSize: 7,
+        }}
+      >
+        <Container maxWidth="lg">
+          <Toolbar
+            variant="regular"
+            sx={(theme) => ({
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              flexShrink: 0,
+              borderRadius: "999px",
+              bgcolor:
+                theme.palette.mode === "light"
+                  ? "rgba(255, 255, 255, 0.4)"
+                  : "rgba(0, 0, 0, 0.4)",
+              backdropFilter: "blur(24px)",
+              maxHeight: 40,
+              border: "1px solid",
+              borderColor: "divider",
+              boxShadow:
+                theme.palette.mode === "light"
+                  ? `0 0 1px rgba(85, 166, 246, 0.1), 1px 1.5px 2px -1px rgba(85, 166, 246, 0.15), 4px 4px 12px -2.5px rgba(85, 166, 246, 0.15)`
+                  : "0 0 1px rgba(2, 31, 59, 0.7), 1px 1.5px 2px -1px rgba(2, 31, 59, 0.65), 4px 4px 12px -2.5px rgba(2, 31, 59, 0.65)",
+            })}
           >
-            AUCTION-THINGS
-          </Typography>
-          <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
-            <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleOpenNavMenu}
-              color="inherit"
-            >
-              <MenuIcon />
-            </IconButton>
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorElNav}
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "left",
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "left",
-              }}
-              open={Boolean(anchorElNav)}
-              onClose={handleCloseNavMenu}
+            <Box
               sx={{
-                display: { xs: "block", md: "none" },
+                flexGrow: 1,
+                display: "flex",
+                alignItems: "center",
+                ml: "-18px",
+                px: 0,
               }}
             >
-              {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography textAlign="center">{page}</Typography>
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box>
-          <AdbIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
-          <Typography
-            variant="h5"
-            noWrap
-            component="a"
-            href="#app-bar-with-responsive-menu"
-            sx={{
-              mr: 2,
-              display: { xs: "flex", md: "none" },
-              flexGrow: 1,
-              fontFamily: "monospace",
-              fontWeight: 700,
-              letterSpacing: ".3rem",
-              color: "inherit",
-              textDecoration: "none",
-            }}
-          >
-            LOGO
-          </Typography>
-          <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-            <Button
-              onClick={handleCloseNavMenu}
-              sx={{ my: 2, color: "white", display: "block" }}
-              href="/#"
-            >
-              Blog
-            </Button>
-            <Button
-              onClick={handleCloseNavMenu}
-              sx={{ my: 2, color: "white", display: "block" }}
-              href="/#"
-            >
-              Pricing
-            </Button>
-            <Button
-              onClick={handleCloseNavMenu}
-              sx={{ my: 2, color: "white", display: "block" }}
-              href="/#"
-            >
-              Products
-            </Button>
-          </Box>
-          <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-            <Search>
-              <SearchIconWrapper>
-                <SearchIcon />
-              </SearchIconWrapper>
-              <StyledInputBase
-                placeholder="Search…"
-                inputProps={{ "aria-label": "search" }}
+              <img
+                src={
+                  "https://assets-global.website-files.com/61ed56ae9da9fd7e0ef0a967/61f12e6faf73568658154dae_SitemarkDefault.svg"
+                }
+                style={logoStyle}
+                alt="logo of sitemark"
               />
-            </Search>
-          </Box>
-          <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-              </IconButton>
-            </Tooltip>
-            <Menu
-              sx={{ mt: "45px" }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
+              <Box sx={{ display: { xs: "none", md: "flex" } }}>
+                <MenuItem
+                  onClick={() => scrollToSection("features")}
+                  sx={{ py: "6px", px: "12px" }}
+                >
+                  <Typography variant="body2" color="text.primary">
+                    Features
+                  </Typography>
+                </MenuItem>
+                <MenuItem
+                  onClick={() => scrollToSection("testimonials")}
+                  sx={{ py: "6px", px: "12px" }}
+                >
+                  <Typography variant="body2" color="text.primary">
+                    Testimonials
+                  </Typography>
+                </MenuItem>
+                <MenuItem
+                  onClick={() => scrollToSection("highlights")}
+                  sx={{ py: "6px", px: "12px" }}
+                >
+                  <Typography variant="body2" color="text.primary">
+                    Highlights
+                  </Typography>
+                </MenuItem>
+                <MenuItem
+                  onClick={() => scrollToSection("pricing")}
+                  sx={{ py: "6px", px: "12px" }}
+                >
+                  <Typography variant="body2" color="text.primary">
+                    Pricing
+                  </Typography>
+                </MenuItem>
+                <MenuItem
+                  onClick={() => scrollToSection("faq")}
+                  sx={{ py: "6px", px: "12px" }}
+                >
+                  <Typography variant="body2" color="text.primary">
+                    FAQ
+                  </Typography>
+                </MenuItem>
+              </Box>
+            </Box>
+            <Box
+              sx={{
+                display: { xs: "none", md: "flex" },
+                gap: 0.5,
+                alignItems: "center",
               }}
-              keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
             >
-              <MenuItem onClick={handleCloseUserMenu}>
-                <Link to="/auth">
-                  <Typography textAlign="center">Login</Typography>
-                </Link>
-              </MenuItem>
-            </Menu>
-          </Box>
-        </Toolbar>
-      </Container>
-    </AppBar>
+              <ToggleColorMode mode={mode} toggleColorMode={toggleColorMode} />
+              <Button
+                color="primary"
+                variant="text"
+                size="small"
+                component="a"
+                href="/auth"
+                target="_blank"
+              >
+                Sign in
+              </Button>
+              <Button
+                color="primary"
+                variant="contained"
+                size="small"
+                component="a"
+                href="/auth"
+                target="_blank"
+              >
+                Sign up
+              </Button>
+            </Box>
+            <Box sx={{ display: { sm: "", md: "none" } }}>
+              <Button
+                variant="text"
+                color="primary"
+                aria-label="menu"
+                onClick={toggleDrawer(true)}
+                sx={{ minWidth: "30px", p: "4px" }}
+              >
+                <MenuIcon />
+              </Button>
+              <Drawer anchor="right" open={open} onClose={toggleDrawer(false)}>
+                <Box
+                  sx={{
+                    minWidth: "60dvw",
+                    p: 2,
+                    backgroundColor: "background.paper",
+                    flexGrow: 1,
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "end",
+                      flexGrow: 1,
+                    }}
+                  >
+                    <ToggleColorMode
+                      mode={mode}
+                      toggleColorMode={toggleColorMode}
+                    />
+                  </Box>
+                  <MenuItem onClick={() => scrollToSection("features")}>
+                    Features
+                  </MenuItem>
+                  <MenuItem onClick={() => scrollToSection("testimonials")}>
+                    Testimonials
+                  </MenuItem>
+                  <MenuItem onClick={() => scrollToSection("highlights")}>
+                    Highlights
+                  </MenuItem>
+                  <MenuItem onClick={() => scrollToSection("pricing")}>
+                    Pricing
+                  </MenuItem>
+                  <MenuItem onClick={() => scrollToSection("faq")}>
+                    FAQ
+                  </MenuItem>
+                  <Divider />
+                  <MenuItem>
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      component="a"
+                      href="/material-ui/getting-started/templates/sign-up/"
+                      target="_blank"
+                      sx={{ width: "100%" }}
+                    >
+                      Sign up
+                    </Button>
+                  </MenuItem>
+                  <MenuItem>
+                    <Button
+                      color="primary"
+                      variant="outlined"
+                      component="a"
+                      href="/material-ui/getting-started/templates/sign-in/"
+                      target="_blank"
+                      sx={{ width: "100%" }}
+                    >
+                      Sign in
+                    </Button>
+                  </MenuItem>
+                </Box>
+              </Drawer>
+            </Box>
+          </Toolbar>
+        </Container>
+      </AppBar>
+    </div>
   );
 };
-export default NavBar;
+
+AppAppBar.propTypes = {
+  mode: PropTypes.oneOf(["dark", "light"]).isRequired,
+  toggleColorMode: PropTypes.func.isRequired,
+};
+
+export default AppAppBar;
