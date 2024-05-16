@@ -13,15 +13,21 @@ import MenuItem from "@mui/material/MenuItem";
 import Drawer from "@mui/material/Drawer";
 import MenuIcon from "@mui/icons-material/Menu";
 import ToggleColorMode from "../../shared/components/ToggleColorMode";
+import Link from "@mui/material/Link";
+import { Link as RouterLink } from "react-router-dom";
 
-const logoStyle = {
-  width: "140px",
-  height: "auto",
-  cursor: "pointer",
-};
+import { useAuth } from "../../shared/hooks/useAuth";
+
+// const logoStyle = {
+//   width: "140px",
+//   height: "auto",
+//   cursor: "pointer",
+// };
 
 const AppAppBar = ({ mode, toggleColorMode }) => {
   const [open, setOpen] = useState(false);
+
+  const { isLoggedIn, logOut } = useAuth();
 
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
@@ -85,20 +91,24 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
                 px: 0,
               }}
             >
-              <img
-                src={
-                  "https://assets-global.website-files.com/61ed56ae9da9fd7e0ef0a967/61f12e6faf73568658154dae_SitemarkDefault.svg"
-                }
-                style={logoStyle}
-                alt="logo of sitemark"
-              />
+              <Typography
+                variant="h6"
+                fontWeight={600}
+                sx={{ color: "#01579b" }}
+              >
+                <Link to="/" component={RouterLink} underline="hover">
+                  AUCTION-THINGS
+                </Link>
+              </Typography>
               <Box sx={{ display: { xs: "none", md: "flex" } }}>
                 <MenuItem
                   onClick={() => scrollToSection("features")}
                   sx={{ py: "6px", px: "12px" }}
                 >
                   <Typography variant="body2" color="text.primary">
-                    Features
+                    <Link to="/lots" component={RouterLink} underline="hover">
+                      Lots
+                    </Link>
                   </Typography>
                 </MenuItem>
                 <MenuItem
@@ -143,26 +153,39 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
               }}
             >
               <ToggleColorMode mode={mode} toggleColorMode={toggleColorMode} />
-              <Button
-                color="primary"
-                variant="text"
-                size="small"
-                component="a"
-                href="/auth"
-                target="_blank"
-              >
-                Sign in
-              </Button>
-              <Button
-                color="primary"
-                variant="contained"
-                size="small"
-                component="a"
-                href="/auth"
-                target="_blank"
-              >
-                Sign up
-              </Button>
+              {isLoggedIn ? (
+                <>
+                  <Button
+                    color="primary"
+                    variant="contained"
+                    size="small"
+                    onClick={logOut}
+                  >
+                    Вийти
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    color="primary"
+                    variant="text"
+                    size="small"
+                    component={RouterLink}
+                    to="/login"
+                  >
+                    Увійти
+                  </Button>
+                  <Button
+                    color="primary"
+                    variant="contained"
+                    size="small"
+                    component={RouterLink}
+                    to="#"
+                  >
+                    Зареєструватися
+                  </Button>
+                </>
+              )}
             </Box>
             <Box sx={{ display: { sm: "", md: "none" } }}>
               <Button
@@ -216,24 +239,22 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
                     <Button
                       color="primary"
                       variant="contained"
-                      component="a"
-                      href="/material-ui/getting-started/templates/sign-up/"
-                      target="_blank"
+                      component={RouterLink}
+                      to="#"
                       sx={{ width: "100%" }}
                     >
-                      Sign up
+                      Зареєструватися
                     </Button>
                   </MenuItem>
                   <MenuItem>
                     <Button
                       color="primary"
                       variant="outlined"
-                      component="a"
-                      href="/material-ui/getting-started/templates/sign-in/"
-                      target="_blank"
+                      component={RouterLink}
+                      to="/login"
                       sx={{ width: "100%" }}
                     >
-                      Sign in
+                      Увійти
                     </Button>
                   </MenuItem>
                 </Box>
