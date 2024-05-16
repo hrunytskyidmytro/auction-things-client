@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
+import { LoadingButton } from "@mui/lab";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -12,19 +12,32 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { useNavigate } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
+
+import { useLoginUserMutation } from "../../api/userApi";
 
 const defaultTheme = createTheme();
 
-const Auth = () => {
-//   const [isLoginMode, setIsLoginMode] = useState(true);
+const Login = () => {
+  const [loginUser, { data, isLoading, isError, error }] =
+    useLoginUserMutation();
+  const navigate = useNavigate();
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     console.log({
       email: data.get("email"),
       password: data.get("password"),
     });
+    try {
+      await loginUser({
+        email: data.get("email"),
+        password: data.get("password"),
+      }).unwrap();
+      navigate(`/check-pin-code?email=${data.get("email")}`);
+    } catch (err) {}
   };
 
   return (
@@ -40,11 +53,12 @@ const Auth = () => {
               alignItems: "center",
             }}
           >
+            {error && error.data.message}
             <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
               <LockOutlinedIcon />
             </Avatar>
             <Typography component="h1" variant="h5">
-              Sign in
+              Авторизація
             </Typography>
             <Box
               component="form"
@@ -72,27 +86,24 @@ const Auth = () => {
                 id="password"
                 autoComplete="current-password"
               />
-              <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
-                label="Remember me"
-              />
-              <Button
+              <LoadingButton
+                loading={isLoading}
                 type="submit"
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
               >
-                Sign In
-              </Button>
+                Увійти
+              </LoadingButton>
               <Grid container>
                 <Grid item xs>
-                  <Link href="#" variant="body2">
-                    Forgot password?
+                  <Link to="#" component={RouterLink} variant="body2">
+                    Забули пароль?
                   </Link>
                 </Grid>
                 <Grid item>
-                  <Link href="#" variant="body2">
-                    {"Don't have an account? Sign Up"}
+                  <Link to="#" component={RouterLink} variant="body2">
+                    Не маєш аккаунту? Зареєструватися
                   </Link>
                 </Grid>
               </Grid>
@@ -105,4 +116,4 @@ const Auth = () => {
   );
 };
 
-export default Auth;
+export default Login;

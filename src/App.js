@@ -1,17 +1,20 @@
 import React from "react";
-import { BrowserRouter } from "react-router-dom";
+import { RouterProvider } from "react-router-dom";
+import { store } from "./store";
+import { Provider } from "react-redux";
 
-import AppRouter from "./routes/AppRouter";
+import { router } from "./routes/router";
 
 import "./App.css";
+import { AuthMiddleware } from "./shared/middleware/AuthMiddleware";
 
 const App = () => {
   return (
-    <>
-      <BrowserRouter>
-        <AppRouter />
-      </BrowserRouter>
-    </>
+    <Provider store={store}>
+      <AuthMiddleware>
+        <RouterProvider router={router} />
+      </AuthMiddleware>
+    </Provider>
   );
 };
 
