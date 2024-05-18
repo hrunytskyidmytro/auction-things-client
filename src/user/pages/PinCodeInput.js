@@ -15,8 +15,7 @@ import { useAuth } from "../../shared/hooks/useAuth";
 const defaultTheme = createTheme();
 
 const PinCodeInput = () => {
-  const [checkPinCode, { data, isLoading, isError, error }] =
-    useCheckPinCodeMutation();
+  const [checkPinCode, { isLoading }] = useCheckPinCodeMutation();
 
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();

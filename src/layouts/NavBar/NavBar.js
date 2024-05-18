@@ -180,7 +180,7 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
                     variant="contained"
                     size="small"
                     component={RouterLink}
-                    to="#"
+                    to="/select-role"
                   >
                     Зареєструватися
                   </Button>
