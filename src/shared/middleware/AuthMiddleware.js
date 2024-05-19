@@ -3,6 +3,8 @@ import { useDispatch } from "react-redux";
 import { setToken, setUser } from "../../store/authSlice";
 import { useLazyGetCurrentUserInfoQuery } from "../../api/userApi";
 
+import { CircularProgress, Box } from "@mui/material";
+
 export const AuthMiddleware = ({ children }) => {
   const dispatch = useDispatch();
   const [getCurrentUser] = useLazyGetCurrentUserInfoQuery();
@@ -24,7 +26,18 @@ export const AuthMiddleware = ({ children }) => {
   }, []);
 
   if (isLoading) {
-    return "Завантаження...";
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <CircularProgress size={120} thickness={3.6}/>
+      </Box>
+    );
   }
 
   return children;

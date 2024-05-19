@@ -13,6 +13,7 @@ import {
   Chip,
   IconButton,
   InputAdornment,
+  Button,
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
@@ -53,19 +54,6 @@ const Login = () => {
     }
   }, [error]);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-
-    try {
-      await loginUser({
-        email: data.get("email"),
-        password: data.get("password"),
-      }).unwrap();
-      navigate(`/check-pin-code?email=${data.get("email")}`);
-    } catch (err) {}
-  };
-
   const handleGoogleLogin = () => {
     window.location.href = `${process.env.REACT_APP_API_URL}/auth/google`;
   };
@@ -74,6 +62,21 @@ const Login = () => {
 
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+
+    try {
+      const response = await loginUser({
+        email: data.get("email"),
+        password: data.get("password"),
+      }).unwrap();
+      navigate(
+        `/check-pin-code?email=${data.get("email")}&userId=${response.userId}`
+      );
+    } catch (err) {}
   };
 
   return (
@@ -173,7 +176,11 @@ const Login = () => {
                 </LoadingButton>
                 <Grid container>
                   <Grid item xs>
-                    <Link to="#" component={RouterLink} variant="body2">
+                    <Link
+                      to="/request-password-reset"
+                      component={RouterLink}
+                      variant="body2"
+                    >
                       Забули пароль?
                     </Link>
                   </Grid>
@@ -187,30 +194,24 @@ const Login = () => {
                     </Link>
                   </Grid>
                 </Grid>
+                <Divider sx={{ my: 2, width: "100%" }}>
+                  <Chip label="Або" size="small" />
+                </Divider>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  onClick={handleGoogleLogin}
+                  sx={{ mt: 1, mb: 2 }}
+                  startIcon={
+                    <img
+                      src="https://img.icons8.com/color/16/000000/google-logo.png"
+                      alt="google icon"
+                    />
+                  }
+                >
+                  Увійти через Google
+                </Button>
               </Box>
-              <Grid container justifyContent="center">
-                <Grid item xs={12} sm={8} md={5}>
-                  <Box>
-                    <Divider sx={{ my: 2, width: "100%" }}>
-                      <Chip label="Або" size="small" />
-                    </Divider>
-                    <LoadingButton
-                      fullWidth
-                      variant="outlined"
-                      onClick={handleGoogleLogin}
-                      sx={{ mt: 1, mb: 2 }}
-                      startIcon={
-                        <img
-                          src="https://img.icons8.com/color/16/000000/google-logo.png"
-                          alt="google icon"
-                        />
-                      }
-                    >
-                      Увійти через Google
-                    </LoadingButton>
-                  </Box>
-                </Grid>
-              </Grid>
             </Box>
           </Grid>
         </Grid>

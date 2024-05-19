@@ -27,6 +27,13 @@ export const userApi = createApi({
         body: data,
       }),
     }),
+    resendPinCode: builder.mutation({
+      query: (data) => ({
+        url: "/resend-pin-code",
+        method: "POST",
+        body: data,
+      }),
+    }),
     getCurrentUserInfo: builder.query({
       query: ({ token }) => ({
         url: "/current-user",
@@ -43,5 +50,6 @@ export const {
   useLoginUserMutation,
   useCreateUserMutation,
   useCheckPinCodeMutation,
+  useResendPinCodeMutation,
   useLazyGetCurrentUserInfoQuery,
 } = userApi;

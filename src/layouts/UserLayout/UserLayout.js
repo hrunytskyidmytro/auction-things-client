@@ -7,16 +7,19 @@ import Footer from "../Footer/Footer";
 import getLPTheme from "../../shared/components/getLPTheme";
 import { Outlet } from "react-router-dom";
 
+const defaultTheme = createTheme();
+
 const UserLayout = () => {
   const [mode, setMode] = useState("light");
   const LPtheme = createTheme(getLPTheme(mode));
+  const defaultTheme = createTheme({ palette: { mode } });
 
   const toggleColorMode = () => {
     setMode((prev) => (prev === "dark" ? "light" : "dark"));
   };
 
   return (
-    <ThemeProvider theme={LPtheme}>
+    <ThemeProvider theme={defaultTheme}>
       <CssBaseline />
       <NavBar mode={mode} toggleColorMode={toggleColorMode} />
       <Box sx={{ bgcolor: "background.default" }}>

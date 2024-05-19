@@ -1,8 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { Box, Grid, Link, Avatar, Typography, TextField } from "@mui/material";
+import {
+  Box,
+  Grid,
+  Link,
+  Avatar,
+  Typography,
+  TextField,
+  InputAdornment,
+  IconButton,
+} from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import { useNavigate } from "react-router-dom";
+
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
@@ -13,6 +23,7 @@ import Paper from "@mui/material/Paper";
 import CssBaseline from "@mui/material/CssBaseline";
 
 import { useCreateUserMutation } from "../../api/userApi";
+import { useNavigate } from "react-router-dom";
 
 const defaultTheme = createTheme();
 
@@ -23,6 +34,8 @@ const BuyerSignUp = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [role, setRole] = useState("");
 
+  const [showPassword, setShowPassword] = useState(false);
+
   useEffect(() => {
     const path = window.location.pathname.split("/");
     const roleFromPath = path[path.length - 1].toUpperCase();
@@ -31,6 +44,12 @@ const BuyerSignUp = () => {
 
   const handleChange = (value) => {
     setPhoneNumber(value);
+  };
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
   };
 
   const handleSubmit = async (event) => {
@@ -49,9 +68,7 @@ const BuyerSignUp = () => {
         phoneNumber: phoneNumber,
       }).unwrap();
       navigate(`/check-pin-code?email=${data.get("email")}`);
-    } catch (err) {
-      console.error("Error:", err);
-    }
+    } catch (err) {}
   };
 
   return (
@@ -145,8 +162,22 @@ const BuyerSignUp = () => {
                     fullWidth
                     name="password"
                     label="Пароль"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     id="password"
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={handleClickShowPassword}
+                            onMouseDown={handleMouseDownPassword}
+                            edge="end"
+                          >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -155,8 +186,22 @@ const BuyerSignUp = () => {
                     fullWidth
                     name="confirmPassword"
                     label="Пароль ще раз"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     id="confirmPassword"
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={handleClickShowPassword}
+                            onMouseDown={handleMouseDownPassword}
+                            edge="end"
+                          >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </Grid>
                 <Grid item xs={12}>

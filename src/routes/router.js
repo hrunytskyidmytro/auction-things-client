@@ -2,10 +2,16 @@ import React from "react";
 import { createBrowserRouter, Outlet } from "react-router-dom";
 
 import Login from "../user/pages/Login";
+
 import PinCodeInput from "../user/pages/PinCodeInput";
+
+import RequestPasswordReset from "../user/pages/RequestPasswordReset";
+import ResetPassword from "../user/pages/ResetPassword";
+
 import RoleSelectionPage from "../user/pages/RoleSelectionPage";
 import BuyerSignUp from "../user/pages/BuyerSignUp";
 import SellerSignUp from "../user/pages/SellerSignUp";
+
 import NotFoundPage from "../shared/pages/NotFoundPage";
 
 import GoogleAuthCallback from "../user/pages/GoogleAuthCallback";
@@ -79,6 +85,20 @@ export const router = createBrowserRouter([
             path: "/auth/google/callback",
             element: <GoogleAuthCallback />,
           },
+          {
+            path: "request-password-reset",
+            element: <RequestPasswordReset />,
+          },
+          {
+            path: "reset-password",
+            element: <Outlet />,
+            children: [
+              {
+                path: ":token",
+                element: <ResetPassword />,
+              },
+            ],
+          },
         ],
       },
     ],
@@ -88,69 +108,3 @@ export const router = createBrowserRouter([
     element: <NotFoundPage />,
   },
 ]);
-
-// export const router = createBrowserRouter([
-//   {
-//     path: "/",
-//     element: <UserLayout />,
-//     children: [
-//       {
-//         index: true,
-//         element: <MoreInfo />,
-//       },
-//       {
-//         path: "lots",
-//         element: <Outlet />,
-//         children: [
-//           {
-//             index: true,
-//             element: <Lots />,
-//           },
-//           {
-//             path: "new",
-//             element: <NewLot />,
-//           },
-//         ],
-//       },
-//       {
-//         element: <AnonymousOutlet />,
-//         children: [
-//           {
-//             path: "login",
-//             element: <Login />,
-//           },
-//           {
-//             path: "check-pin-code",
-//             element: <PinCodeInput />,
-//           },
-//           {
-//             path: "select-role",
-//             element: <RoleSelectionPage />,
-//           },
-//           {
-//             path: "signup",
-//             element: <Outlet />,
-//             children: [
-//               {
-//                 path: "buyer",
-//                 element: <BuyerSignUp />,
-//               },
-//               {
-//                 path: "seller",
-//                 element: <SellerSignUp />,
-//               },
-//             ],
-//           },
-//           {
-//             path: "/auth/google/callback",
-//             element: <GoogleAuthCallback />,
-//           },
-//         ],
-//       },
-//       {
-//         path: "*",
-//         element: <NotFoundPage />,
-//       },
-//     ],
-//   },
-// ]);

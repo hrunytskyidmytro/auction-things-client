@@ -5,11 +5,11 @@ import {
   Radio,
   RadioGroup,
   FormControlLabel,
+  Container,
+  Box,
+  Divider,
+  Alert,
 } from "@mui/material";
-import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
-import Divider from "@mui/material/Divider";
-import Alert from "@mui/material/Alert";
 
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
@@ -35,7 +35,11 @@ const RoleSelectionPage = () => {
 
   return (
     <ThemeProvider theme={defaultTheme}>
-      <Container component="main" maxWidth="xs">
+      <Container
+        component="main"
+        maxWidth="xs"
+        style={{ textAlign: "center", paddingTop: "50px" }}
+      >
         <Box
           sx={{
             marginTop: 15,
@@ -56,21 +60,27 @@ const RoleSelectionPage = () => {
             onChange={handleRoleChange}
             aria-label="role"
             name="role"
+            style={{ marginTop: "10px" }}
           >
             <FormControlLabel
               value="BUYER"
-              control={<Radio />}
+              control={<Radio style={{ fontSize: "24px" }} />}
               label="Покупець"
             />
-            <Divider />
+            <Divider style={{ margin: "10px 0", width: "100%" }} />
             <FormControlLabel
               value="SELLER"
-              control={<Radio />}
+              control={<Radio style={{ fontSize: "24px" }} />}
               label="Продавець"
             />
           </RadioGroup>
-          <Divider />
-          <Button variant="contained" color="primary" onClick={handleSubmit}>
+          <Divider style={{ margin: "10px 0", width: "100%" }} />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSubmit}
+            style={{ marginTop: "20px" }}
+          >
             Продовжити
           </Button>
         </Box>
