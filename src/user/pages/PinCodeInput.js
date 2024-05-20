@@ -37,12 +37,6 @@ const PinCodeInput = () => {
 
   const [otp, setOtp] = useState("");
 
-  useEffect(() => {
-    if (error) {
-      setOpenErrorAlert(true);
-    }
-  }, [error]);
-
   const handleSubmit = async () => {
     try {
       const { token, ...response } = await checkPinCode({
@@ -52,7 +46,9 @@ const PinCodeInput = () => {
       setToken(token);
       dispatch(setUser(response));
       navigate("/");
-    } catch (err) {}
+    } catch (err) {
+      setOpenErrorAlert(true);
+    }
   };
 
   const handleResendPinCode = async () => {
@@ -61,7 +57,9 @@ const PinCodeInput = () => {
         email: searchParams.get("email"),
         userId: searchParams.get("userId"),
       }).unwrap();
-    } catch (err) {}
+    } catch (err) {
+      setOpenErrorAlert(true);
+    }
   };
 
   return (

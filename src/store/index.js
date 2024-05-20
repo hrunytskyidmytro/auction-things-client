@@ -10,6 +10,8 @@ export const store = configureStore({
     [authSlice.name]: authSlice.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(userApi.middleware),
+    getDefaultMiddleware()
+      .concat(userApi.middleware)
+      .concat(passwordResetApi.middleware),
   devTools: process.env.NODE_ENV !== "production",
 });

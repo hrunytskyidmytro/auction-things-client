@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import {
   Box,
@@ -14,40 +14,22 @@ import {
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
+import { Formik, Field, Form } from "formik";
+
+import { validationSchemaRequestPasswordReset } from "../../shared/utils/validatorsSchemes";
+
 import { useRequestPasswordResetMutation } from "../../api/passwordResetApi";
 
 const defaultTheme = createTheme();
 
 const RequestPasswordReset = () => {
-  const [email, setEmail] = useState("");
-  const [successMessage, setSuccessMessage] = useState(false);
-//   const [errorMessage, setErrorMessage] = useState("");
-
-  const [openErrorAlert, setOpenErrorAlert] = useState("");
+  const [openSuccessAlert, setOpenSuccessAlert] = useState(false);
+  const [openErrorAlert, setOpenErrorAlert] = useState(false);
 
   const [showCloseMessage, setShowCloseMessage] = useState(false);
 
   const [requestPasswordReset, { isLoading, error }] =
     useRequestPasswordResetMutation();
-
-  useEffect(() => {
-    if (error) {
-      setOpenErrorAlert(true);
-    }
-  }, [error]);
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-
-    try {
-      await requestPasswordReset({ email: data.get("email") }).unwrap();
-      //   setSuccessMessage("Запит успішно надіслано!");
-      setSuccessMessage(true);
-      setEmail("");
-      setTimeout(() => setShowCloseMessage(true), 10000);
-    } catch (err) {}
-  };
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -86,49 +68,66 @@ const RequestPasswordReset = () => {
             <Typography component="h1" variant="h5">
               Запит на скидання пароля
             </Typography>
-            <Box
-              component="form"
-              onSubmit={handleSubmit}
-              noValidate
-              sx={{ mt: 1 }}
+            <Formik
+              initialValues={{
+                email: "",
+              }}
+              validationSchema={validationSchemaRequestPasswordReset}
+              onSubmit={async (values, { setSubmitting }) => {
+                try {
+                  await requestPasswordReset({
+                    email: values.email,
+                  }).unwrap();
+                  values.email = "";
+                  setOpenSuccessAlert(true);
+                  setTimeout(() => setShowCloseMessage(true), 10000);
+                } catch (err) {
+                  setOpenErrorAlert(true);
+                }
+                setSubmitting(false);
+              }}
             >
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                id="email"
-                label="Email"
-                name="email"
-                autoComplete="email"
-                autoFocus
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              <LoadingButton
-                loading={isLoading}
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{ mt: 3, mb: 2 }}
-              >
-                Надіслати запит
-              </LoadingButton>
-            </Box>
+              {({ isSubmitting, errors, touched }) => (
+                <Form noValidate sx={{ mt: 1 }}>
+                  <Field
+                    as={TextField}
+                    margin="normal"
+                    required
+                    fullWidth
+                    id="email"
+                    label="Email"
+                    name="email"
+                    autoComplete="email"
+                    autoFocus
+                    error={touched.email && Boolean(errors.email)}
+                    helperText={touched.email && errors.email}
+                  />
+                  <LoadingButton
+                    loading={isSubmitting || isLoading}
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    sx={{ mt: 3, mb: 2 }}
+                  >
+                    Надіслати запит
+                  </LoadingButton>
+                </Form>
+              )}
+            </Formik>
           </Box>
         </Grid>
       </Grid>
       <Snackbar
-        open={successMessage}
+        open={openSuccessAlert}
         autoHideDuration={5000}
-        onClose={() => setSuccessMessage(false)}
+        onClose={() => setOpenSuccessAlert(false)}
       >
         <Alert
-          onClose={() => setSuccessMessage(false)}
+          onClose={() => setOpenSuccessAlert(false)}
           severity="success"
           variant="filled"
           sx={{ width: "100%" }}
         >
-          {/* {successMessage} */}
           Запит успішно надіслано!
         </Alert>
       </Snackbar>

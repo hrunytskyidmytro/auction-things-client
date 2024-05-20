@@ -14,17 +14,21 @@ import {
   IconButton,
   InputAdornment,
   Button,
+  Paper,
+  CssBaseline,
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+
+import { Formik, Field, Form, ErrorMessage } from "formik";
 
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 import { useNavigate, useLocation } from "react-router-dom";
 import { Link as RouterLink } from "react-router-dom";
 
-import Paper from "@mui/material/Paper";
-import CssBaseline from "@mui/material/CssBaseline";
+import { validationSchemaLogin } from "../../shared/utils/validatorsSchemes";
 
 import { useLoginUserMutation } from "../../api/userApi";
 
@@ -48,12 +52,6 @@ const Login = () => {
     }
   }, [location]);
 
-  useEffect(() => {
-    if (error) {
-      setOpenErrorAlert(true);
-    }
-  }, [error]);
-
   const handleGoogleLogin = () => {
     window.location.href = `${process.env.REACT_APP_API_URL}/auth/google`;
   };
@@ -62,21 +60,6 @@ const Login = () => {
 
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
-  };
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-
-    try {
-      const response = await loginUser({
-        email: data.get("email"),
-        password: data.get("password"),
-      }).unwrap();
-      navigate(
-        `/check-pin-code?email=${data.get("email")}&userId=${response.userId}`
-      );
-    } catch (err) {}
   };
 
   return (
@@ -125,93 +108,121 @@ const Login = () => {
               <Typography component="h1" variant="h5">
                 Авторизація
               </Typography>
-              <Box
-                component="form"
-                onSubmit={handleSubmit}
-                noValidate
-                sx={{ mt: 1 }}
-              >
-                <TextField
-                  margin="normal"
-                  required
-                  fullWidth
-                  id="email"
-                  label="Email"
-                  name="email"
-                  autoComplete="email"
-                  autoFocus
-                />
-                <TextField
-                  margin="normal"
-                  required
-                  fullWidth
-                  name="password"
-                  label="Пароль"
-                  type={showPassword ? "text" : "password"}
-                  id="password"
-                  autoComplete="current-password"
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label="toggle password visibility"
-                          onClick={handleClickShowPassword}
-                          onMouseDown={handleMouseDownPassword}
-                          edge="end"
-                        >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-                <LoadingButton
-                  loading={isLoading}
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  sx={{ mt: 3, mb: 2 }}
-                >
-                  Увійти
-                </LoadingButton>
-                <Grid container>
-                  <Grid item xs>
-                    <Link
-                      to="/request-password-reset"
-                      component={RouterLink}
-                      variant="body2"
-                    >
-                      Забули пароль?
-                    </Link>
-                  </Grid>
-                  <Grid item>
-                    <Link
-                      to="/select-role"
-                      component={RouterLink}
-                      variant="body2"
-                    >
-                      Не маєш аккаунту? Зареєструватися
-                    </Link>
-                  </Grid>
-                </Grid>
-                <Divider sx={{ my: 2, width: "100%" }}>
-                  <Chip label="Або" size="small" />
-                </Divider>
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  onClick={handleGoogleLogin}
-                  sx={{ mt: 1, mb: 2 }}
-                  startIcon={
-                    <img
-                      src="https://img.icons8.com/color/16/000000/google-logo.png"
-                      alt="google icon"
-                    />
+              <Formik
+                initialValues={{
+                  email: "",
+                  password: "",
+                }}
+                validationSchema={validationSchemaLogin}
+                onSubmit={async (values, { setSubmitting }) => {
+                  try {
+                    const response = await loginUser({
+                      email: values.email,
+                      password: values.password,
+                    }).unwrap();
+                    navigate(
+                      `/check-pin-code?email=${values.email}&userId=${response.userId}`
+                    );
+                  } catch (err) {
+                    setOpenErrorAlert(true);
                   }
-                >
-                  Увійти через Google
-                </Button>
-              </Box>
+                  setSubmitting(false);
+                }}
+              >
+                {({ errors, touched }) => (
+                  <Form sx={{ mt: 1 }}>
+                    <Field
+                      as={TextField}
+                      margin="normal"
+                      required
+                      fullWidth
+                      id="email"
+                      label="Email"
+                      name="email"
+                      autoComplete="email"
+                      error={Boolean(touched.email && errors.email)}
+                      helperText={<ErrorMessage name="email" />}
+                    />
+                    <Field
+                      as={TextField}
+                      margin="normal"
+                      required
+                      fullWidth
+                      name="password"
+                      label="Пароль"
+                      type={showPassword ? "text" : "password"}
+                      id="password"
+                      autoComplete="current-password"
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              aria-label="toggle password visibility"
+                              onClick={handleClickShowPassword}
+                              onMouseDown={handleMouseDownPassword}
+                              edge="end"
+                            >
+                              {showPassword ? (
+                                <VisibilityOff />
+                              ) : (
+                                <Visibility />
+                              )}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                      error={Boolean(touched.password && errors.password)}
+                      helperText={<ErrorMessage name="password" />}
+                    />
+                    <LoadingButton
+                      loading={isLoading}
+                      type="submit"
+                      fullWidth
+                      variant="contained"
+                      sx={{ mt: 3, mb: 2 }}
+                    >
+                      Увійти
+                    </LoadingButton>
+                    <Grid container>
+                      <Grid item xs>
+                        <Link
+                          to="/request-password-reset"
+                          component={RouterLink}
+                          variant="body2"
+                        >
+                          Забули пароль?
+                        </Link>
+                      </Grid>
+                      <Grid item>
+                        <Link
+                          to="/select-role"
+                          component={RouterLink}
+                          variant="body2"
+                        >
+                          Не маєш аккаунту? Зареєструватися
+                        </Link>
+                      </Grid>
+                    </Grid>
+                    <Divider sx={{ my: 2, width: "100%" }}>
+                      <Chip label="Або" size="small" />
+                    </Divider>
+                    <Button
+                      fullWidth
+                      variant="outlined"
+                      onClick={handleGoogleLogin}
+                      sx={{ mt: 1, mb: 2 }}
+                      startIcon={
+                        <img
+                          src="https://img.icons8.com/color/16/000000/google-logo.png"
+                          alt="google icon"
+                        />
+                      }
+                    >
+                      Увійти через Google
+                    </Button>
+                  </Form>
+                )}
+              </Formik>
             </Box>
           </Grid>
         </Grid>
