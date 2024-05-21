@@ -12,9 +12,9 @@ import {
   Alert,
   Grid,
   Paper,
+  createTheme,
+  ThemeProvider,
 } from "@mui/material";
-
-import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 import { useNavigate } from "react-router-dom";
 

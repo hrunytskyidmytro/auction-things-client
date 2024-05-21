@@ -10,14 +10,13 @@ import {
   Avatar,
   Paper,
   CssBaseline,
+  createTheme,
+  ThemeProvider,
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 import { Formik, Field, Form } from "formik";
-
 import { validationSchemaRequestPasswordReset } from "../../shared/utils/validatorsSchemes";
-
 import { useRequestPasswordResetMutation } from "../../api/passwordResetApi";
 
 const defaultTheme = createTheme();
@@ -25,6 +24,8 @@ const defaultTheme = createTheme();
 const RequestPasswordReset = () => {
   const [openSuccessAlert, setOpenSuccessAlert] = useState(false);
   const [openErrorAlert, setOpenErrorAlert] = useState(false);
+
+  const [successMessage, setSuccessMessage] = useState("");
 
   const [showCloseMessage, setShowCloseMessage] = useState(false);
 
@@ -75,11 +76,12 @@ const RequestPasswordReset = () => {
               validationSchema={validationSchemaRequestPasswordReset}
               onSubmit={async (values, { setSubmitting }) => {
                 try {
-                  await requestPasswordReset({
+                  const response = await requestPasswordReset({
                     email: values.email,
                   }).unwrap();
                   values.email = "";
                   setOpenSuccessAlert(true);
+                  setSuccessMessage(response.message);
                   setTimeout(() => setShowCloseMessage(true), 10000);
                 } catch (err) {
                   setOpenErrorAlert(true);
@@ -128,7 +130,7 @@ const RequestPasswordReset = () => {
           variant="filled"
           sx={{ width: "100%" }}
         >
-          Запит успішно надіслано!
+          {successMessage}
         </Alert>
       </Snackbar>
       <Snackbar

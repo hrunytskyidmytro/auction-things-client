@@ -10,26 +10,23 @@ import {
   IconButton,
   Alert,
   Snackbar,
+  createTheme,
+  ThemeProvider,
+  Paper,
+  CssBaseline,
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-
-import { Formik, Field, Form } from "formik";
 
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-
-import Paper from "@mui/material/Paper";
-import CssBaseline from "@mui/material/CssBaseline";
-
+import { Formik, Field, Form } from "formik";
 import { validationSchemaForBuyer } from "../../shared/utils/validatorsSchemes";
 
-import { useCreateUserMutation } from "../../api/userApi";
 import { useNavigate } from "react-router-dom";
+import { useCreateUserMutation } from "../../api/userApi";
 
 const defaultTheme = createTheme();
 

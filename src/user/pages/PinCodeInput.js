@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import {
   Container,
@@ -7,19 +7,24 @@ import {
   Link,
   Snackbar,
   Alert,
+  createTheme,
+  ThemeProvider,
 } from "@mui/material";
 import { MuiOtpInput } from "mui-one-time-password-input";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { Link as RouterLink } from "react-router-dom";
-
-import { useCheckPinCodeMutation } from "../../api/userApi";
-import { useResendPinCodeMutation } from "../../api/userApi";
-
+import {
+  Link as RouterLink,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { setUser } from "../../store/authSlice";
 
-import { useNavigate, useSearchParams } from "react-router-dom";
+import {
+  useCheckPinCodeMutation,
+  useResendPinCodeMutation,
+} from "../../api/userApi";
 import { useAuth } from "../../shared/hooks/useAuth";
+
+import { setUser } from "../../store/authSlice";
 
 const defaultTheme = createTheme();
 
@@ -27,7 +32,10 @@ const PinCodeInput = () => {
   const [checkPinCode, { isLoading, error }] = useCheckPinCodeMutation();
   const [resendPinCode] = useResendPinCodeMutation();
 
+  const [openSuccessAlert, setOpenSuccessAlert] = useState(false);
   const [openErrorAlert, setOpenErrorAlert] = useState(false);
+
+  const [successMessage, setSuccessMessage] = useState("");
 
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
@@ -53,10 +61,12 @@ const PinCodeInput = () => {
 
   const handleResendPinCode = async () => {
     try {
-      await resendPinCode({
+      const response = await resendPinCode({
         email: searchParams.get("email"),
         userId: searchParams.get("userId"),
       }).unwrap();
+      setOpenSuccessAlert(true);
+      setSuccessMessage(response.message);
     } catch (err) {
       setOpenErrorAlert(true);
     }
@@ -74,8 +84,11 @@ const PinCodeInput = () => {
               alignItems: "center",
             }}
           >
+            <Typography variant="overline" component="div" sx={{ mb: 2 }}>
+              Вам було надіслано пін-код на електронну адресу.
+            </Typography>
             <Typography variant="h6" component="div" sx={{ mb: 2 }}>
-              Введіть код для пошти:
+              Введіть пін-код для пошти:
             </Typography>
             <Typography
               variant="body1"
@@ -110,6 +123,20 @@ const PinCodeInput = () => {
             </Typography>
           </Box>
         </Container>
+        <Snackbar
+          open={openSuccessAlert}
+          autoHideDuration={5000}
+          onClose={() => setOpenSuccessAlert(false)}
+        >
+          <Alert
+            onClose={() => setOpenSuccessAlert(false)}
+            severity="success"
+            variant="filled"
+            sx={{ width: "100%" }}
+          >
+            {successMessage}
+          </Alert>
+        </Snackbar>
         <Snackbar
           open={openErrorAlert}
           autoHideDuration={5000}

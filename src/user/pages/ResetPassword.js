@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useResetPasswordMutation } from "../../api/passwordResetApi";
 import {
   Box,
   TextField,
@@ -12,17 +11,16 @@ import {
   Paper,
   IconButton,
   InputAdornment,
+  createTheme,
+  ThemeProvider,
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 import { Formik, Form, Field } from "formik";
-
 import { validationSchemaResetPassword } from "../../shared/utils/validatorsSchemes";
-
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { useResetPasswordMutation } from "../../api/passwordResetApi";
 
 const defaultTheme = createTheme();
 
@@ -54,18 +52,7 @@ const ResetPassword = () => {
           justifyContent: "center",
         }}
       >
-        <Grid
-          item
-          xs={12}
-          sm={8}
-          md={5}
-          component={Paper}
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
+        <Grid item xs={12} sm={8} md={5} component={Paper}>
           <Box
             sx={{
               my: 8,
@@ -73,7 +60,6 @@ const ResetPassword = () => {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              width: "100%",
             }}
           >
             <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
@@ -95,6 +81,8 @@ const ResetPassword = () => {
                     newPassword: values.newPassword,
                     confirmPassword: values.confirmPassword,
                   }).unwrap();
+                  values.newPassword = "";
+                  values.confirmPassword = "";
                   setOpenSuccessAlert(true);
                   setTimeout(() => navigate("/login"), 10000);
                 } catch (err) {

@@ -16,20 +16,15 @@ import {
   Button,
   Paper,
   CssBaseline,
+  createTheme,
+  ThemeProvider,
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 import { Formik, Field, Form, ErrorMessage } from "formik";
-
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-
-import { useNavigate, useLocation } from "react-router-dom";
-import { Link as RouterLink } from "react-router-dom";
-
+import { Link as RouterLink, useNavigate, useLocation } from "react-router-dom";
 import { validationSchemaLogin } from "../../shared/utils/validatorsSchemes";
-
 import { useLoginUserMutation } from "../../api/userApi";
 
 const defaultTheme = createTheme();
@@ -204,7 +199,7 @@ const Login = () => {
                       </Grid>
                     </Grid>
                     <Divider sx={{ my: 2, width: "100%" }}>
-                      <Chip label="Або" size="small" />
+                      <Chip label="АБО" size="small" />
                     </Divider>
                     <Button
                       fullWidth

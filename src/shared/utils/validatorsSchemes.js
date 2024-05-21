@@ -1,9 +1,21 @@
 import * as yup from "yup";
 
 export const validationSchemaForBuyer = yup.object().shape({
-  firstName: yup.string().required("Введіть ім'я"),
-  lastName: yup.string().required("Введіть прізвище"),
-  patronymic: yup.string().required("Введіть по-батькові"),
+  firstName: yup
+    .string()
+    .required("Введіть ім'я")
+    .min(2, "Ім'я повинно містити не менше 2 символів")
+    .max(32, "Ім'я не може містити більше 32 символів"),
+  lastName: yup
+    .string()
+    .required("Введіть прізвище")
+    .min(2, "Прізвище повинно містити не менше 2 символів")
+    .max(32, "Прізвище не може містити більше 32 символів"),
+  patronymic: yup
+    .string()
+    .required("Введіть по-батькові")
+    .min(2, "По-батькові повинно містити не менше 2 символів")
+    .max(32, "По-батькові не може містити більше 32 символів"),
   email: yup.string().required("Введіть email").email("Неправильний email"),
   password: yup
     .string()
@@ -20,9 +32,21 @@ export const validationSchemaForBuyer = yup.object().shape({
 });
 
 export const validationSchemaForSeller = yup.object().shape({
-  firstName: yup.string().required("Введіть ім'я"),
-  lastName: yup.string().required("Введіть прізвище"),
-  patronymic: yup.string().required("Введіть по-батькові"),
+  firstName: yup
+    .string()
+    .required("Введіть ім'я")
+    .min(2, "Ім'я повинно містити не менше 2 символів")
+    .max(32, "Ім'я не може містити більше 32 символів"),
+  lastName: yup
+    .string()
+    .required("Введіть прізвище")
+    .min(2, "Прізвище повинно містити не менше 2 символів")
+    .max(32, "Прізвище не може містити більше 32 символів"),
+  patronymic: yup
+    .string()
+    .required("Введіть по-батькові")
+    .min(2, "По-батькові повинно містити не менше 2 символів")
+    .max(32, "По-батькові не може містити більше 32 символів"),
   email: yup.string().required("Введіть email").email("Неправильний email"),
   password: yup
     .string()
@@ -36,6 +60,15 @@ export const validationSchemaForSeller = yup.object().shape({
     .string()
     .required("Повторіть пароль")
     .oneOf([yup.ref("password"), null], "Паролі не співпадають"),
+  companyName: yup
+    .string()
+    .required("Введіть назву компанії.")
+    .min(2, "Назва компанії повинна містити не менше 2 символів"),
+  companySite: yup.string().url("Неправильний формат URL-адреси.").nullable(),
+  position: yup
+    .string()
+    .required("Введіть свою посаду.")
+    .min(2, "Посада повинна містити не менше 2 символів"),
 });
 
 export const validationSchemaLogin = yup.object().shape({
