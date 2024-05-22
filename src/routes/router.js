@@ -2,6 +2,7 @@ import React from "react";
 import { createBrowserRouter, Outlet } from "react-router-dom";
 
 import Login from "../user/pages/Login";
+import UserProfile from "../user/pages/UserProfile";
 
 import PinCodeInput from "../user/pages/PinCodeInput";
 
@@ -46,6 +47,10 @@ export const router = createBrowserRouter([
             element: <NewLot />,
           },
         ],
+      },
+      {
+        path: "user-profile",
+        element: <UserProfile />,
       },
     ],
   },

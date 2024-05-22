@@ -35,7 +35,7 @@ export const AuthMiddleware = ({ children }) => {
           height: "100vh",
         }}
       >
-        <CircularProgress size={120} thickness={3.6}/>
+        <CircularProgress size={50} thickness={3.6} />
       </Box>
     );
   }

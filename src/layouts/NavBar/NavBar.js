@@ -2,19 +2,35 @@ import React, { useState } from "react";
 
 import PropTypes from "prop-types";
 
-import Box from "@mui/material/Box";
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import Button from "@mui/material/Button";
-import Container from "@mui/material/Container";
-import Divider from "@mui/material/Divider";
-import Typography from "@mui/material/Typography";
-import MenuItem from "@mui/material/MenuItem";
-import Drawer from "@mui/material/Drawer";
+import {
+  Box,
+  AppBar,
+  Toolbar,
+  Button,
+  Container,
+  Divider,
+  Typography,
+  MenuItem,
+  Drawer,
+  Link,
+  Avatar,
+  Tooltip,
+  Menu,
+  IconButton,
+  ListItemIcon,
+  Snackbar,
+  Alert,
+} from "@mui/material";
+import { blue } from "@mui/material/colors";
+
 import MenuIcon from "@mui/icons-material/Menu";
+import PersonAdd from "@mui/icons-material/PersonAdd";
+import Settings from "@mui/icons-material/Settings";
+import Logout from "@mui/icons-material/Logout";
+
 import ToggleColorMode from "../../shared/components/ToggleColorMode";
-import Link from "@mui/material/Link";
-import { Link as RouterLink } from "react-router-dom";
+
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../shared/hooks/useAuth";
 
@@ -26,11 +42,34 @@ import { useAuth } from "../../shared/hooks/useAuth";
 
 const AppAppBar = ({ mode, toggleColorMode }) => {
   const [open, setOpen] = useState(false);
+  const [anchorElUser, setAnchorElUser] = useState(null);
 
-  const { isLoggedIn, logOut } = useAuth();
+  const { isLoggedIn, logOut, user, errorToken, setErrorToken } = useAuth();
+
+  const navigate = useNavigate();
+
+  const handleOpenUserMenu = (event) => {
+    setAnchorElUser(event.currentTarget);
+  };
+
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
+  };
 
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
+  };
+
+  const handleCloseMenuAndDrawer = (path) => () => {
+    navigate(path);
+    handleCloseUserMenu();
+    setOpen(false);
+  };
+
+  const stringAvatar = (name) => {
+    return {
+      children: `${name.split(" ")[0][0]}${name.split(" ")[1][0]}`,
+    };
   };
 
   // const scrollToSection = (sectionId) => {
@@ -93,7 +132,7 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
             >
               <Typography
                 variant="h6"
-                fontWeight={600}
+                fontWeight={500}
                 sx={{ color: "#01579b" }}
               >
                 <Link to="/" component={RouterLink} underline="hover">
@@ -155,20 +194,96 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
               <ToggleColorMode mode={mode} toggleColorMode={toggleColorMode} />
               {isLoggedIn ? (
                 <>
-                  <Button
-                    color="primary"
-                    variant="contained"
-                    size="small"
-                    onClick={logOut}
-                  >
-                    Вийти
-                  </Button>
+                  <Box sx={{ flexGrow: 0 }}>
+                    <Tooltip title="Відкрити налаштування">
+                      <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                        <Avatar
+                          sx={{ bgcolor: blue[700] }}
+                          {...stringAvatar(
+                            `${user?.firstName} ${user?.lastName}`
+                          )}
+                        />
+                      </IconButton>
+                    </Tooltip>
+                    <Menu
+                      sx={{ mt: "45px" }}
+                      id="menu-appbar"
+                      anchorEl={anchorElUser}
+                      anchorOrigin={{
+                        vertical: "top",
+                        horizontal: "right",
+                      }}
+                      keepMounted
+                      transformOrigin={{
+                        vertical: "top",
+                        horizontal: "right",
+                      }}
+                      open={Boolean(anchorElUser)}
+                      onClose={handleCloseUserMenu}
+                      PaperProps={{
+                        elevation: 0,
+                        sx: {
+                          overflow: "visible",
+                          filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                          mt: 1.5,
+                          "& .MuiAvatar-root": {
+                            width: 32,
+                            height: 32,
+                            ml: -0.5,
+                            mr: 1,
+                          },
+                          "&::before": {
+                            content: '""',
+                            display: "block",
+                            position: "absolute",
+                            top: 0,
+                            right: 14,
+                            width: 10,
+                            height: 10,
+                            bgcolor: "background.paper",
+                            transform: "translateY(-50%) rotate(45deg)",
+                            zIndex: 0,
+                          },
+                        },
+                      }}
+                      transitionDuration={400}
+                    >
+                      <MenuItem
+                        onClick={handleCloseMenuAndDrawer("/user-profile")}
+                      >
+                        <Avatar
+                          sx={{ mr: 1 }}
+                          alt={`${user?.firstName} ${user?.lastName}`}
+                        />
+                        {`${user?.firstName} ${user?.lastName}`}
+                      </MenuItem>
+                      <Divider />
+                      <MenuItem onClick={handleCloseUserMenu}>
+                        <ListItemIcon>
+                          <PersonAdd fontSize="small" />
+                        </ListItemIcon>
+                        Додати новий аккаунт
+                      </MenuItem>
+                      <MenuItem onClick={handleCloseUserMenu}>
+                        <ListItemIcon>
+                          <Settings fontSize="small" />
+                        </ListItemIcon>
+                        Налаштування
+                      </MenuItem>
+                      <MenuItem onClick={logOut}>
+                        <ListItemIcon>
+                          <Logout fontSize="small" />
+                        </ListItemIcon>
+                        Вихід
+                      </MenuItem>
+                    </Menu>
+                  </Box>
                 </>
               ) : (
                 <>
                   <Button
                     color="primary"
-                    variant="text"
+                    variant="outlined"
                     size="small"
                     component={RouterLink}
                     to="/login"
@@ -225,34 +340,146 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
                   <MenuItem>Pricing</MenuItem>
                   <MenuItem>FAQ</MenuItem>
                   <Divider />
-                  <MenuItem>
-                    <Button
-                      color="primary"
-                      variant="contained"
-                      component={RouterLink}
-                      to="#"
-                      sx={{ width: "100%" }}
-                    >
-                      Зареєструватися
-                    </Button>
-                  </MenuItem>
-                  <MenuItem>
-                    <Button
-                      color="primary"
-                      variant="outlined"
-                      component={RouterLink}
-                      to="/login"
-                      sx={{ width: "100%" }}
-                    >
-                      Увійти
-                    </Button>
-                  </MenuItem>
+                  {isLoggedIn ? (
+                    <>
+                      <Box
+                        sx={{
+                          flexGrow: 0,
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Tooltip title="Відкрити налаштування">
+                          <IconButton
+                            onClick={handleOpenUserMenu}
+                            sx={{ p: 0 }}
+                          >
+                            <Avatar
+                              sx={{ bgcolor: blue[700] }}
+                              {...stringAvatar(
+                                `${user?.firstName} ${user?.lastName}`
+                              )}
+                            />
+                          </IconButton>
+                        </Tooltip>
+                        <Menu
+                          sx={{ mt: "45px" }}
+                          id="menu-appbar"
+                          anchorEl={anchorElUser}
+                          anchorOrigin={{
+                            vertical: "top",
+                            horizontal: "right",
+                          }}
+                          keepMounted
+                          transformOrigin={{
+                            vertical: "top",
+                            horizontal: "right",
+                          }}
+                          open={Boolean(anchorElUser)}
+                          onClose={handleCloseUserMenu}
+                          PaperProps={{
+                            elevation: 0,
+                            sx: {
+                              overflow: "visible",
+                              filter:
+                                "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                              mt: 1.5,
+                              "& .MuiAvatar-root": {
+                                width: 32,
+                                height: 32,
+                                ml: -0.5,
+                                mr: 1,
+                              },
+                              "&::before": {
+                                content: '""',
+                                display: "block",
+                                position: "absolute",
+                                top: 0,
+                                right: 14,
+                                width: 10,
+                                height: 10,
+                                bgcolor: "background.paper",
+                                transform: "translateY(-50%) rotate(45deg)",
+                                zIndex: 0,
+                              },
+                            },
+                          }}
+                        >
+                          <MenuItem
+                            onClick={handleCloseMenuAndDrawer("/user-profile")}
+                          >
+                            <Avatar sx={{ mr: 1 }} />
+                            {`${user?.firstName} ${user?.lastName}`}
+                          </MenuItem>
+                          <Divider />
+                          <MenuItem onClick={handleCloseUserMenu}>
+                            <ListItemIcon>
+                              <PersonAdd fontSize="small" />
+                            </ListItemIcon>
+                            Додати новий аккаунт
+                          </MenuItem>
+                          <MenuItem onClick={handleCloseUserMenu}>
+                            <ListItemIcon>
+                              <Settings fontSize="small" />
+                            </ListItemIcon>
+                            Налаштування
+                          </MenuItem>
+                          <MenuItem onClick={logOut}>
+                            <ListItemIcon>
+                              <Logout fontSize="small" />
+                            </ListItemIcon>
+                            Вихід
+                          </MenuItem>
+                        </Menu>
+                      </Box>
+                    </>
+                  ) : (
+                    <>
+                      <MenuItem>
+                        <Button
+                          color="primary"
+                          variant="contained"
+                          size="small"
+                          component={RouterLink}
+                          to="/select-role"
+                        >
+                          Зареєструватися
+                        </Button>
+                      </MenuItem>
+                      <MenuItem>
+                        <Button
+                          color="primary"
+                          variant="outlined"
+                          size="small"
+                          component={RouterLink}
+                          to="/login"
+                        >
+                          Увійти
+                        </Button>
+                      </MenuItem>
+                    </>
+                  )}
                 </Box>
               </Drawer>
             </Box>
           </Toolbar>
         </Container>
       </AppBar>
+      <Snackbar
+        open={errorToken}
+        autoHideDuration={5000}
+        onClose={() => setErrorToken(false)}
+      >
+        <Alert
+          onClose={() => setErrorToken(false)}
+          severity="error"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {"Час токену вийшов, будь ласка, авторизуйтесь знову."}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

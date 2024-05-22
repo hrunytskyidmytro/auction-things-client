@@ -1,12 +1,15 @@
 import * as React from "react";
-import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
-import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-import Link from "@mui/material/Link";
-import { Stack } from "@mui/material";
+import {
+  Stack,
+  Card,
+  CardActions,
+  CardContent,
+  CardMedia,
+  Button,
+  Typography,
+} from "@mui/material";
+
+import { Link as RouterLink } from "react-router-dom";
 
 import { useAuth } from "../hooks/useAuth";
 
@@ -39,7 +42,7 @@ const lots = [
 
 export default function MoreInfo() {
   const { user } = useAuth();
-  
+
   return (
     <>
       <Typography
@@ -77,15 +80,11 @@ export default function MoreInfo() {
               </Typography>
             </CardContent>
             <CardActions>
-              <Button size="small" href="#">
-                <Link href="/lots" underline="hover">
-                  Learn More
-                </Link>
+              <Button size="small" component={RouterLink} href="/lots">
+                Learn More
               </Button>
-              <Button size="small" href="#">
-                <Link href="/lots" underline="hover">
-                  Place a bid
-                </Link>
+              <Button size="small" component={RouterLink} href="/lots">
+                Place a bid
               </Button>
             </CardActions>
           </Card>
@@ -102,17 +101,16 @@ export default function MoreInfo() {
         variant="body2"
         gutterBottom
         sx={{
-          width: 500,
           textAlign: "center",
           fontSize: "1.2rem",
           ml: 87,
           mt: 2,
         }}
       >
-        This is a real text about the developer. Lorem ipsum dolor sit amet,
+        {/* This is a real text about the developer. Lorem ipsum dolor sit amet,
         consectetur adipiscing elit. Sed eget risus porta, tincidunt turpis at,
         interdum ex. Integer sodales odio eget nisl volutpat, in laoreet libero
-        auctor.
+        auctor. */}
       </Typography>
     </>
   );
