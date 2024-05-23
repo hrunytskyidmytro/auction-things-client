@@ -1,28 +1,28 @@
 import React from "react";
 import { createBrowserRouter, Outlet } from "react-router-dom";
 
+import UserLayout from "../layouts/UserLayout/UserLayout";
+import BasicLayout from "../layouts/BasicLayout/BasicLayout";
+
 import Login from "../user/pages/Login";
 import UserProfile from "../user/pages/UserProfile";
-
-import PinCodeInput from "../user/pages/PinCodeInput";
-
-import RequestPasswordReset from "../user/pages/RequestPasswordReset";
-import ResetPassword from "../user/pages/ResetPassword";
-
 import RoleSelectionPage from "../user/pages/RoleSelectionPage";
 import BuyerSignUp from "../user/pages/BuyerSignUp";
 import SellerSignUp from "../user/pages/SellerSignUp";
+import GoogleAuthCallback from "../user/pages/GoogleAuthCallback";
+
+import PinCodeInput from "../user/pages/PinCodeInput";
+import RequestPasswordReset from "../user/pages/RequestPasswordReset";
+import ResetPassword from "../user/pages/ResetPassword";
 
 import NotFoundPage from "../shared/pages/NotFoundPage";
-
-import GoogleAuthCallback from "../user/pages/GoogleAuthCallback";
 
 import Lots from "../shared/components/Lots";
 import NewLot from "../shared/components/NewLot";
 import MoreInfo from "../shared/components/MoreInfo";
 
-import UserLayout from "../layouts/UserLayout/UserLayout";
-import BasicLayout from "../layouts/BasicLayout/BasicLayout";
+import SellerWelcomePage from "../user/pages/SellerWelcomePage";
+
 import { AnonymousOutlet } from "./AnonymousOutlet";
 
 export const router = createBrowserRouter([
@@ -51,6 +51,10 @@ export const router = createBrowserRouter([
       {
         path: "user-profile",
         element: <UserProfile />,
+      },
+      {
+        path: "welcome-seller",
+        element: <SellerWelcomePage />,
       },
     ],
   },
