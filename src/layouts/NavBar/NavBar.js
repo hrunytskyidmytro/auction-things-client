@@ -20,6 +20,7 @@ import {
   ListItemIcon,
   Snackbar,
   Alert,
+  Chip,
 } from "@mui/material";
 import { blue } from "@mui/material/colors";
 
@@ -27,6 +28,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import PersonAdd from "@mui/icons-material/PersonAdd";
 import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
+import AdminPanelSettingsTwoToneIcon from "@mui/icons-material/AdminPanelSettingsTwoTone";
 
 import ToggleColorMode from "../../shared/components/ToggleColorMode";
 
@@ -44,7 +46,15 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
   const [open, setOpen] = useState(false);
   const [anchorElUser, setAnchorElUser] = useState(null);
 
-  const { isLoggedIn, logOut, user, errorToken, setErrorToken } = useAuth();
+  const {
+    isLoggedIn,
+    logOut,
+    user,
+    errorToken,
+    setErrorToken,
+    isAdmin,
+    isSeller,
+  } = useAuth();
 
   const navigate = useNavigate();
 
@@ -256,6 +266,22 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
                           alt={`${user?.firstName} ${user?.lastName}`}
                         />
                         {`${user?.firstName} ${user?.lastName}`}
+                        {isAdmin && (
+                          <Chip
+                            label="Admin"
+                            size="small"
+                            color="primary"
+                            sx={{ m: 1 }}
+                          />
+                        )}
+                        {isSeller && (
+                          <Chip
+                            label="Seller"
+                            size="small"
+                            color="success"
+                            sx={{ m: 1 }}
+                          />
+                        )}
                       </MenuItem>
                       <Divider />
                       <MenuItem onClick={handleCloseUserMenu}>
@@ -264,6 +290,24 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
                         </ListItemIcon>
                         Додати новий аккаунт
                       </MenuItem>
+                      {isAdmin && (
+                        <MenuItem onClick={handleCloseMenuAndDrawer("/admin")}>
+                          <ListItemIcon>
+                            <AdminPanelSettingsTwoToneIcon fontSize="small" />
+                          </ListItemIcon>
+                          Адмін панель
+                        </MenuItem>
+                      )}
+                      {isSeller && (
+                        <MenuItem
+                          onClick={handleCloseMenuAndDrawer("/seller/lots")}
+                        >
+                          <ListItemIcon>
+                            <Settings fontSize="small" />
+                          </ListItemIcon>
+                          Мої лоти
+                        </MenuItem>
+                      )}
                       <MenuItem onClick={handleCloseUserMenu}>
                         <ListItemIcon>
                           <Settings fontSize="small" />
