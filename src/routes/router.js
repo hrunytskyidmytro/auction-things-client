@@ -17,13 +17,17 @@ import ResetPassword from "../user/pages/ResetPassword";
 
 import NotFoundPage from "../shared/pages/NotFoundPage";
 
-import Lots from "../shared/components/Lots";
-import NewLot from "../shared/components/NewLot";
+import Lots from "../lot/pages/Lots";
+import NewLot from "../lot/pages/NewLot";
+
 import MoreInfo from "../shared/components/MoreInfo";
 
 import SellerWelcomePage from "../user/pages/SellerWelcomePage";
 
+import AdminLayout from "../layouts/AdminLayout/pages/AdminLayout";
+
 import { AnonymousOutlet } from "./AnonymousOutlet";
+// import { PrivateOutlet } from "../routes/PrivateOutlet";
 
 export const router = createBrowserRouter([
   {
@@ -35,20 +39,6 @@ export const router = createBrowserRouter([
         element: <MoreInfo />,
       },
       {
-        path: "lots",
-        element: <Outlet />,
-        children: [
-          {
-            index: true,
-            element: <Lots />,
-          },
-          {
-            path: "new",
-            element: <NewLot />,
-          },
-        ],
-      },
-      {
         path: "user-profile",
         element: <UserProfile />,
       },
@@ -56,6 +46,16 @@ export const router = createBrowserRouter([
         path: "welcome-seller",
         element: <SellerWelcomePage />,
       },
+      // {
+      //   path: "seller",
+      //   element: <PrivateOutlet />,
+      //   children: [
+      //     {
+      //       path: "lots",
+      //       element: <Lots />,
+      //     },
+      //   ],
+      // },
     ],
   },
   {
@@ -107,6 +107,26 @@ export const router = createBrowserRouter([
                 element: <ResetPassword />,
               },
             ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    path: "/admin",
+    element: <AdminLayout />,
+    children: [
+      {
+        path: "lots",
+        element: <Outlet />,
+        children: [
+          {
+            index: true,
+            element: <Lots />,
+          },
+          {
+            path: "new",
+            element: <NewLot />,
           },
         ],
       },

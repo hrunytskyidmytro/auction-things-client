@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
@@ -6,7 +6,6 @@ import CardMedia from "@mui/material/CardMedia";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { Stack } from "@mui/material";
-import TextField from "@mui/material/TextField";
 
 import { useNavigate } from "react-router-dom";
 
@@ -76,15 +75,11 @@ const lots2 = [
   },
 ];
 
-export default function Lot() {
+const Lot = () => {
   const navigate = useNavigate();
 
-  const handleSearch = () => {
-    console.log("Search button clicked");
-  };
-
   const handleCreateNewLot = () => {
-    navigate("/lots/new");
+    navigate("/admin/lots/new");
   };
 
   return (
@@ -94,23 +89,6 @@ export default function Lot() {
         justifyContent="center"
         alignItems="center"
         spacing={2}
-        sx={{
-          mt: 15,
-        }}
-      >
-        <TextField id="outlined-basic" label="Search" variant="outlined" />
-        <Button variant="contained" color="primary" onClick={handleSearch}>
-          Search
-        </Button>
-      </Stack>
-      <Stack
-        direction="row"
-        justifyContent="center"
-        alignItems="center"
-        spacing={2}
-        sx={{
-          mt: 5,
-        }}
       >
         <Button
           variant="contained"
@@ -198,4 +176,6 @@ export default function Lot() {
       </Stack>
     </>
   );
-}
+};
+
+export default Lot;
