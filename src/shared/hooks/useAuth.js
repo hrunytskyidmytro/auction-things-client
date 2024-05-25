@@ -46,6 +46,10 @@ export const useAuth = () => {
     dispatch(resetState());
   };
 
+  const isAdmin = user?.role === "ADMIN";
+  const isSeller = user?.role === "SELLER";
+  const isBuyer = user?.role === "BUYER";
+
   return {
     saveToken,
     logOut,
@@ -54,5 +58,8 @@ export const useAuth = () => {
     isLoggedIn: !!token,
     errorToken,
     setErrorToken,
+    isAdmin,
+    isSeller,
+    isBuyer,
   };
 };
