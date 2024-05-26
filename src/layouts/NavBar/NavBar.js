@@ -521,7 +521,7 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
           variant="filled"
           sx={{ width: "100%" }}
         >
-          {"Час токену вийшов, будь ласка, авторизуйтесь знову."}
+          Час токену вийшов, будь ласка, авторизуйтесь знову.
         </Alert>
       </Snackbar>
     </div>
