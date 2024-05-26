@@ -94,3 +94,20 @@ export const validationSchemaResetPassword = yup.object().shape({
     .required("Підтвердіть новий пароль")
     .oneOf([yup.ref("newPassword"), null], "Паролі повинні співпадати"),
 });
+
+////////////////////////////////////////////////////////////////////////////
+
+export const validationSchemaForNewLot = yup.object().shape({
+  title: yup.string().required("Назва є обов'язковою"),
+  description: yup.string().required("Опис є обов'язковим"),
+  startingPrice: yup.number().required("Початкова ціна є обов'язковою"),
+  endDate: yup.date().required("Дата закінчення є обов'язковою"),
+  status: yup
+    .string()
+    .oneOf(["OPEN", "CLOSED", "PENDING"])
+    .required("Статус є обов'язковим"),
+  categoryId: yup.number().required("Категорія є обов'язковою"),
+  buyNowPrice: yup.number(),
+  bidIncrement: yup.number(),
+  reservePrice: yup.number(),
+});
