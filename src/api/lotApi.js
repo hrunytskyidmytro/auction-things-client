@@ -1,19 +1,15 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { baseQueryWithJwt } from "./baseQueryWithToken";
 
 export const lotApi = createApi({
   reducerPath: "lotApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: process.env.REACT_APP_API_URL + "/lots",
-  }),
+  baseQuery: baseQueryWithJwt("/lots"),
   endpoints: (builder) => ({
     createLot: builder.mutation({
-      query: ({data, token}) => ({
+      query: (data) => ({
         url: "/",
         method: "POST",
         body: data,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       }),
     }),
   }),
