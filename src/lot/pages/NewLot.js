@@ -1,47 +1,40 @@
 import React, { useState } from "react";
 import { Formik, Field, Form, ErrorMessage } from "formik";
-import * as Yup from "yup";
 import {
   TextField,
-  Button,
   FormControl,
   InputLabel,
   Box,
   Snackbar,
   Alert,
 } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
+import { Dropzone, FileMosaic } from "@files-ui/react";
+
+import { useNavigate } from "react-router-dom";
 
 import { useCreateLotMutation } from "../../api/lotApi";
 
-import { useAuth } from "../../shared/hooks/useAuth";
-
-const validationSchema = Yup.object().shape({
-  title: Yup.string().required("Назва є обов'язковою"),
-  description: Yup.string().required("Опис є обов'язковим"),
-  startingPrice: Yup.number().required("Початкова ціна є обов'язковою"),
-  currentPrice: Yup.number().required("Поточна ціна є обов'язковою"),
-  endDate: Yup.date().required("Дата закінчення є обов'язковою"),
-  // imageUrl: Yup.string()
-  //   .url("Некоректна URL-адреса")
-  //   .required("URL зображення є обов'язковою"),
-  status: Yup.string()
-    .oneOf(["OPEN", "CLOSED", "PENDING"])
-    .required("Статус є обов'язковим"),
-  categoryId: Yup.number().required("Категорія є обов'язковою"),
-  buyNowPrice: Yup.number(),
-  bidIncrement: Yup.number(),
-  reservePrice: Yup.number(),
-});
+import { validationSchemaForNewLot } from "../../shared/utils/validatorsSchemes";
 
 const NewLot = () => {
-  const [fieldValue, setFieldValue] = useState();
+  const [createLot, { isLoading, error }] = useCreateLotMutation();
+  const navigate = useNavigate();
+
+  const [files, setFiles] = useState([]);
+
+  const [openSuccessAlert, setOpenSuccessAlert] = useState(false);
   const [openErrorAlert, setOpenErrorAlert] = useState(false);
 
-  const [createLot, { error }] = useCreateLotMutation();
+  const [successMessage, setSuccessMessage] = useState("");
 
-  const { token } = useAuth();
+  const updateFiles = (incommingFiles) => {
+    setFiles(incommingFiles);
+  };
 
-  console.log(token);
+  const removeFile = (id) => {
+    setFiles(files.filter((x) => x.id !== id));
+  };
 
   return (
     <>
@@ -59,34 +52,37 @@ const NewLot = () => {
             title: "",
             description: "",
             startingPrice: 0.0,
-            currentPrice: 0.0,
             endDate: "",
-            // imageUrl: "",
-            // status: "PENDING",
+            status: "PENDING",
             categoryId: "",
             buyNowPrice: "",
             bidIncrement: "",
             reservePrice: "",
           }}
-          validationSchema={validationSchema}
+          validationSchema={validationSchemaForNewLot}
           onSubmit={async (values, { setSubmitting }) => {
             try {
-              await createLot(
-                {
-                  title: values.title,
-                  description: values.description,
-                  startingPrice: values.startingPrice,
-                  currentPrice: values.currentPrice,
-                  endDate: values.endDate,
-                  // imageUrl: values.imageUrl,
-                  // status: "PENDING",
-                  categoryId: values.categoryId,
-                  buyNowPrice: values.buyNowPrice,
-                  bidIncrement: values.bidIncrement,
-                  reservePrice: values.reservePrice,
-                },
-                token
-              ).unwrap();
+              const formData = new FormData();
+              formData.append("title", values.title);
+              formData.append("description", values.description);
+              formData.append("startingPrice", values.startingPrice);
+              formData.append("endDate", values.endDate);
+              formData.append("status", "PENDING");
+              formData.append("categoryId", values.categoryId);
+              formData.append("buyNowPrice", values.buyNowPrice);
+              formData.append("bidIncrement", values.bidIncrement);
+              formData.append("reservePrice", values.reservePrice);
+
+              if (files.length > 0) {
+                files.forEach((file) => {
+                  formData.append("images", file.file);
+                });
+              }
+
+              const response = await createLot(formData).unwrap();
+              setOpenSuccessAlert(true);
+              setSuccessMessage(response.message);
+              navigate("/admin/lots");
             } catch (err) {
               setOpenErrorAlert(true);
             }
@@ -130,17 +126,6 @@ const NewLot = () => {
               />
               <Field
                 as={TextField}
-                label="Поточна ціна"
-                name="currentPrice"
-                type="number"
-                required
-                margin="normal"
-                fullWidth
-                error={touched.currentPrice && Boolean(errors.currentPrice)}
-                helperText={<ErrorMessage name="currentPrice" />}
-              />
-              <Field
-                as={TextField}
                 label="Дата закінчення"
                 name="endDate"
                 type="datetime-local"
@@ -159,16 +144,28 @@ const NewLot = () => {
                 error={touched.imageFiles && Boolean(errors.imageFiles)}
               >
                 <InputLabel shrink>Зображення</InputLabel>
-                <input
-                  type="file"
-                  name="imageUrl"
-                  accept="image/*"
-                  multiple
-                  onChange={(event) => {
-                    setFieldValue("imageFiles", event.currentTarget.files);
+                <Dropzone
+                  onChange={updateFiles}
+                  value={files}
+                  label={"Перетягніть файли сюди або натисніть, щоб вибрати"}
+                  accept={"image/*"}
+                  maxFileSize={28 * 1024 * 1024}
+                  maxFiles={5}
+                  footerConfig={{
+                    customMessage: "Підтримуються типи: png, jpeg, jpg",
                   }}
-                  style={{ display: "block", marginTop: "16px" }}
-                />
+                  fakeUpload
+                >
+                  {files.map((file) => (
+                    <FileMosaic
+                      key={file.id}
+                      {...file}
+                      onDelete={removeFile}
+                      info
+                      preview
+                    />
+                  ))}
+                </Dropzone>
                 <ErrorMessage
                   name="imageFiles"
                   component="div"
@@ -220,19 +217,34 @@ const NewLot = () => {
                 error={touched.reservePrice && Boolean(errors.reservePrice)}
                 helperText={<ErrorMessage name="reservePrice" />}
               />
-              <Button
+              <LoadingButton
                 type="submit"
                 variant="contained"
                 color="primary"
+                loading={isLoading}
                 disabled={isSubmitting}
                 sx={{ mt: 3 }}
               >
                 Створити лот
-              </Button>
+              </LoadingButton>
             </Form>
           )}
         </Formik>
       </Box>
+      <Snackbar
+        open={openSuccessAlert}
+        autoHideDuration={5000}
+        onClose={() => setOpenSuccessAlert(false)}
+      >
+        <Alert
+          onClose={() => setOpenSuccessAlert(false)}
+          severity="success"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {successMessage}
+        </Alert>
+      </Snackbar>
       <Snackbar
         open={openErrorAlert}
         autoHideDuration={5000}
