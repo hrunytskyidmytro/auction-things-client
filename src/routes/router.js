@@ -19,6 +19,7 @@ import NotFoundPage from "../shared/pages/NotFoundPage";
 
 import Lots from "../lot/pages/Lots";
 import NewLot from "../lot/pages/NewLot";
+import UpdateLot from "../lot/pages/UpdateLot";
 
 import MoreInfo from "../shared/components/MoreInfo";
 
@@ -78,7 +79,6 @@ export const router = createBrowserRouter([
           },
           {
             path: "signup",
-            element: <Outlet />,
             children: [
               {
                 path: "buyer",
@@ -100,7 +100,6 @@ export const router = createBrowserRouter([
           },
           {
             path: "reset-password",
-            element: <Outlet />,
             children: [
               {
                 path: ":token",
@@ -118,7 +117,6 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "lots",
-        element: <Outlet />,
         children: [
           {
             index: true,
@@ -127,6 +125,10 @@ export const router = createBrowserRouter([
           {
             path: "new",
             element: <NewLot />,
+          },
+          {
+            path: ":id",
+            element: <UpdateLot />,
           },
         ],
       },

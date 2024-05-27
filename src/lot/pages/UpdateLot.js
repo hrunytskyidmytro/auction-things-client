@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import {
   TextField,
@@ -13,20 +14,46 @@ import { Dropzone, FileMosaic } from "@files-ui/react";
 
 import { useNavigate } from "react-router-dom";
 
-import { useCreateLotMutation } from "../../api/lotApi";
+import { useGetLotByIdQuery, useUpdateLotMutation } from "../../api/lotApi";
 
 import { validationSchemaForNewLot } from "../../shared/utils/validatorsSchemes";
 
-const NewLot = () => {
-  const [createLot, { isLoading, error }] = useCreateLotMutation();
+const UpdateLot = () => {
+  const { id } = useParams();
+  const {
+    data: lot,
+    isLoading: isFetching,
+    error: fetchError,
+  } = useGetLotByIdQuery(id);
+  const [updateLot, { isLoading, error }] = useUpdateLotMutation();
+
   const navigate = useNavigate();
 
   const [files, setFiles] = useState([]);
+  const [existingImages, setExistingImages] = useState([]);
 
   const [openSuccessAlert, setOpenSuccessAlert] = useState(false);
   const [openErrorAlert, setOpenErrorAlert] = useState(false);
 
   const [successMessage, setSuccessMessage] = useState("");
+
+  // useEffect(() => {
+  //   if (lot) {
+  //     setExistingImages(lot.imageUrls);
+  //   }
+  // }, [lot]);
+
+  useEffect(() => {
+    if (lot) {
+      const formattedExistingImages = lot.imageUrls.map((url, index) => ({
+        id: index,
+        name: `Existing image ${index + 1}`,
+        file: { type: "image/*" },
+        source: url.startsWith("uploads") ? `/${url}` : url,
+      }));
+      setExistingImages(formattedExistingImages);
+    }
+  }, [lot]);
 
   const updateFiles = (incommingFiles) => {
     setFiles(incommingFiles);
@@ -34,7 +61,19 @@ const NewLot = () => {
 
   const removeFile = (id) => {
     setFiles(files.filter((x) => x.id !== id));
+    setExistingImages(existingImages.filter((x) => x.id !== id));
   };
+
+  if (isFetching) {
+    return <div>Loading...</div>;
+  }
+
+  if (fetchError) {
+    return <div>Error: {fetchError.message}</div>;
+  }
+
+  console.log(lot);
+  console.log(existingImages);
 
   return (
     <>
@@ -49,15 +88,16 @@ const NewLot = () => {
       >
         <Formik
           initialValues={{
-            title: "",
-            description: "",
-            startingPrice: 0.0,
-            endDate: "",
-            status: "PENDING",
-            categoryId: "",
-            buyNowPrice: "",
-            bidIncrement: "",
-            reservePrice: "",
+            title: lot.title || "",
+            description: lot.description || "",
+            startingPrice: lot.startingPrice || 0.0,
+            endDate: lot.endDate || "",
+            status: lot.status || "PENDING",
+            categoryId: lot.categoryId || "",
+            buyNowPrice: lot.buyNowPrice || "",
+            bidIncrement: lot.bidIncrement || "",
+            reservePrice: lot.reservePrice || "",
+            existingImages: lot.imageUrls || [],
           }}
           validationSchema={validationSchemaForNewLot}
           onSubmit={async (values, { setSubmitting }) => {
@@ -73,13 +113,17 @@ const NewLot = () => {
               formData.append("bidIncrement", values.bidIncrement);
               formData.append("reservePrice", values.reservePrice);
 
+              values.existingImages.forEach((imageUrl) => {
+                formData.append("existingImages", imageUrl);
+              });
+
               if (files.length > 0) {
                 files.forEach((file) => {
                   formData.append("images", file.file);
                 });
               }
 
-              const response = await createLot(formData).unwrap();
+              const response = await updateLot({ id, data: formData }).unwrap();
               setOpenSuccessAlert(true);
               setSuccessMessage(response.message);
               navigate("/admin/lots");
@@ -99,7 +143,7 @@ const NewLot = () => {
                 <InputLabel shrink>Зображення</InputLabel>
                 <Dropzone
                   onChange={updateFiles}
-                  value={files}
+                  value={existingImages}
                   label={"Перетягніть файли сюди або натисніть, щоб вибрати"}
                   accept={"image/*"}
                   maxFileSize={28 * 1024 * 1024}
@@ -109,11 +153,20 @@ const NewLot = () => {
                   }}
                   fakeUpload
                 >
+                  {/* {existingImages.map((file) => (
+                    <FileMosaic
+                      key={file.id}
+                      {...file}
+                      onDelete={() => removeFile(file.id)}
+                      info
+                      preview
+                    />
+                  ))} */}
                   {files.map((file) => (
                     <FileMosaic
                       key={file.id}
                       {...file}
-                      onDelete={removeFile}
+                      onDelete={() => removeFile(file.id)}
                       info
                       preview
                     />
@@ -175,6 +228,11 @@ const NewLot = () => {
                 }}
                 error={touched.endDate && Boolean(errors.endDate)}
                 helperText={<ErrorMessage name="endDate" />}
+                value={
+                  lot.endDate
+                    ? new Date(lot.endDate).toISOString().slice(0, 16)
+                    : ""
+                }
               />
               <Field
                 as={TextField}
@@ -225,7 +283,7 @@ const NewLot = () => {
                 disabled={isSubmitting}
                 sx={{ mt: 3 }}
               >
-                Створити лот
+                Оновити лот
               </LoadingButton>
             </Form>
           )}
@@ -263,4 +321,4 @@ const NewLot = () => {
   );
 };
 
-export default NewLot;
+export default UpdateLot;
