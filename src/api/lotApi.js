@@ -12,7 +12,38 @@ export const lotApi = createApi({
         body: data,
       }),
     }),
+    updateLot: builder.mutation({
+      query: ({ id, ...data }) => ({
+        url: `/${id}`,
+        method: "PATCH",
+        body: data,
+      }),
+    }),
+    deleteLot: builder.mutation({
+      query: (id) => ({
+        url: `/${id}`,
+        method: "DELETE",
+      }),
+    }),
+    getLotById: builder.query({
+      query: (id) => ({
+        url: `/${id}`,
+        method: "GET",
+      }),
+    }),
+    getAllLots: builder.query({
+      query: () => ({
+        url: "/",
+        method: "GET",
+      }),
+    }),
   }),
 });
 
-export const { useCreateLotMutation } = lotApi;
+export const {
+  useCreateLotMutation,
+  useUpdateLotMutation,
+  useDeleteLotMutation,
+  useGetLotByIdQuery,
+  useGetAllLotsQuery,
+} = lotApi;
