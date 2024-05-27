@@ -156,7 +156,7 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
                 >
                   <Typography variant="body2" color="text.primary">
                     <Link to="/lots" component={RouterLink} underline="hover">
-                      Lots
+                      Лоти
                     </Link>
                   </Typography>
                 </MenuItem>
@@ -165,7 +165,7 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
                   sx={{ py: "6px", px: "12px" }}
                 >
                   <Typography variant="body2" color="text.primary">
-                    Testimonials
+                    Продати на Auction-things
                   </Typography>
                 </MenuItem>
                 <MenuItem
@@ -173,7 +173,7 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
                   sx={{ py: "6px", px: "12px" }}
                 >
                   <Typography variant="body2" color="text.primary">
-                    Highlights
+                    Поради щодо купівлі
                   </Typography>
                 </MenuItem>
                 <MenuItem
@@ -181,7 +181,7 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
                   sx={{ py: "6px", px: "12px" }}
                 >
                   <Typography variant="body2" color="text.primary">
-                    Pricing
+                    Про нас
                   </Typography>
                 </MenuItem>
                 <MenuItem

@@ -168,12 +168,14 @@ const AdminLayout = () => {
           }}
         >
           <Toolbar />
-          <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-            <Grid container spacing={3}>
-              <PrivateOutlet />
-            </Grid>
-            <Copyright sx={{ pt: 4 }} />
-          </Container>
+          <Box
+            sx={{
+              m: 2,
+            }}
+          >
+            <PrivateOutlet />
+          </Box>
+          <Copyright sx={{ pt: 4, pb: 4 }} />
         </Box>
       </Box>
     </ThemeProvider>

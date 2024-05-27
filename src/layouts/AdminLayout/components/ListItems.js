@@ -9,9 +9,9 @@ import {
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import PeopleIcon from "@mui/icons-material/People";
-import BarChartIcon from "@mui/icons-material/BarChart";
 import LayersIcon from "@mui/icons-material/Layers";
 import AssignmentIcon from "@mui/icons-material/Assignment";
+import GavelIcon from '@mui/icons-material/Gavel';
 
 import { useNavigate } from "react-router-dom";
 
@@ -34,10 +34,8 @@ export const mainListItems = (
   <>
     <>
       <MainListItem to="/" primary="Головна панель" icon={<DashboardIcon />} />
-      <MainListItem to="#" primary="Замовлення" icon={<ShoppingCartIcon />} />
       <MainListItem to="#" primary="Користувачі" icon={<PeopleIcon />} />
-      <MainListItem to="/admin/lots" primary="Лоти" icon={<BarChartIcon />} />
-      <MainListItem to="#" primary="Інтеграції" icon={<LayersIcon />} />
+      <MainListItem to="/admin/lots" primary="Лоти" icon={<GavelIcon />} />
     </>
   </>
 );
