@@ -1,10 +1,9 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { baseQueryWithJwt } from "./baseQueryWithToken";
 
 export const userApi = createApi({
   reducerPath: "userApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: process.env.REACT_APP_API_URL + "/user",
-  }),
+  baseQuery: baseQueryWithJwt("/user"),
   endpoints: (builder) => ({
     loginUser: builder.mutation({
       query: (data) => ({
@@ -35,12 +34,21 @@ export const userApi = createApi({
       }),
     }),
     getCurrentUserInfo: builder.query({
-      query: ({ token }) => ({
+      query: () => ({
         url: "/current-user",
         method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      }),
+    }),
+    getAllUsers: builder.query({
+      query: () => ({
+        url: "/",
+        method: "GET",
+      }),
+    }),
+    deleteUser: builder.mutation({
+      query: (id) => ({
+        url: `/${id}`,
+        method: "DELETE",
       }),
     }),
   }),
@@ -52,4 +60,6 @@ export const {
   useCheckPinCodeMutation,
   useResendPinCodeMutation,
   useLazyGetCurrentUserInfoQuery,
+  useGetAllUsersQuery,
+  useDeleteUserMutation,
 } = userApi;
