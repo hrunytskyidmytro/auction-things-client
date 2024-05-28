@@ -69,7 +69,6 @@ const Lots = () => {
 
   const handleCloseModalForDeleting = () => {
     setOpenDeleteConfirmation(false);
-    setSelectedLots([]);
   };
 
   const handleConfirmDelete = async () => {
@@ -292,7 +291,7 @@ const Lots = () => {
           onRowSelectionModelChange={(newSelection) => {
             setSelectedLots(newSelection);
           }}
-          disableSelectionOnClick
+          disableRowSelectionOnClick
           getRowId={(row) => row.id}
           localeText={ukUA.components.MuiDataGrid.defaultProps.localeText}
         />

@@ -1,5 +1,5 @@
 import React from "react";
-import { createBrowserRouter, Outlet } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 
 import UserLayout from "../layouts/UserLayout/UserLayout";
 import BasicLayout from "../layouts/BasicLayout/BasicLayout";
@@ -20,6 +20,12 @@ import NotFoundPage from "../shared/pages/NotFoundPage";
 import Lots from "../lot/pages/Lots";
 import NewLot from "../lot/pages/NewLot";
 import UpdateLot from "../lot/pages/UpdateLot";
+
+import Users from "../admin/users/pages/Users";
+
+import Categories from "../admin/categories/pages/Categories";
+
+import Bids from "../admin/bids/pages/Bids";
 
 import MoreInfo from "../shared/components/MoreInfo";
 
@@ -130,6 +136,57 @@ export const router = createBrowserRouter([
             path: ":id",
             element: <UpdateLot />,
           },
+        ],
+      },
+      {
+        path: "users",
+        children: [
+          {
+            index: true,
+            element: <Users />,
+          },
+          // {
+          //   path: "new",
+          //   element: <NewLot />,
+          // },
+          // {
+          //   path: ":id",
+          //   element: <UpdateLot />,
+          // },
+        ],
+      },
+      {
+        path: "categories",
+        children: [
+          {
+            index: true,
+            element: <Categories />,
+          },
+          // {
+          //   path: "new",
+          //   element: <NewLot />,
+          // },
+          // {
+          //   path: ":id",
+          //   element: <UpdateLot />,
+          // },
+        ],
+      },
+      {
+        path: "bids",
+        children: [
+          {
+            index: true,
+            element: <Bids />,
+          },
+          // {
+          //   path: "new",
+          //   element: <NewLot />,
+          // },
+          // {
+          //   path: ":id",
+          //   element: <UpdateLot />,
+          // },
         ],
       },
     ],
