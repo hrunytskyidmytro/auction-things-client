@@ -36,11 +36,13 @@ import { Link as RouterLink, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../shared/hooks/useAuth";
 
-// const logoStyle = {
-//   width: "140px",
-//   height: "auto",
-//   cursor: "pointer",
-// };
+const logoStyle = {
+  marginTop: "9px",
+  marginLeft: "16px",
+  width: "140px",
+  height: "auto",
+  cursor: "pointer",
+};
 
 const AppAppBar = ({ mode, toggleColorMode }) => {
   const [open, setOpen] = useState(false);
@@ -140,32 +142,32 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
                 px: 0,
               }}
             >
-              <Typography
-                variant="h6"
-                fontWeight={500}
-                sx={{ color: "#01579b" }}
-              >
-                <Link to="/" component={RouterLink} underline="hover">
-                  AUCTION-THINGS
-                </Link>
-              </Typography>
+              <Link to="/" component={RouterLink} underline="hover">
+                <Typography
+                  variant="h6"
+                  fontWeight={500}
+                  sx={{ color: "#01579b" }}
+                >
+                  <img src="/logo.png" style={logoStyle} alt="Логотип" />
+                </Typography>
+              </Link>
               <Box sx={{ display: { xs: "none", md: "flex" } }}>
                 <MenuItem
                   // onClick={() => scrollToSection("features")}
                   sx={{ py: "6px", px: "12px" }}
                 >
-                  <Typography variant="body2" color="text.primary">
-                    <Link to="/lots" component={RouterLink} underline="hover">
+                  <Link to="/lots" component={RouterLink} underline="hover">
+                    <Typography variant="body2" color="text.primary">
                       Лоти
-                    </Link>
-                  </Typography>
+                    </Typography>
+                  </Link>
                 </MenuItem>
                 <MenuItem
                   // onClick={() => scrollToSection("testimonials")}
                   sx={{ py: "6px", px: "12px" }}
                 >
                   <Typography variant="body2" color="text.primary">
-                    Продати на Auction-things
+                    Продати на Bid&Win
                   </Typography>
                 </MenuItem>
                 <MenuItem
