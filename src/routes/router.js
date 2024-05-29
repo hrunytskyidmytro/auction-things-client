@@ -17,9 +17,9 @@ import ResetPassword from "../user/pages/ResetPassword";
 
 import NotFoundPage from "../shared/pages/NotFoundPage";
 
-import Lots from "../lot/pages/Lots";
-import NewLot from "../lot/pages/NewLot";
-import UpdateLot from "../lot/pages/UpdateLot";
+import Lots from "../admin/lots/pages/Lots";
+import NewLot from "../admin/lots/pages/NewLot";
+import UpdateLot from "../admin/lots/pages/UpdateLot";
 
 import Users from "../admin/users/pages/Users";
 
@@ -28,6 +28,9 @@ import Categories from "../admin/categories/pages/Categories";
 import Bids from "../admin/bids/pages/Bids";
 
 import MoreInfo from "../shared/components/MoreInfo";
+
+import LotsForBuyers from "../lots/pages/Lots";
+import LotDetail from "../lots/pages/LotDetail";
 
 import SellerWelcomePage from "../user/pages/SellerWelcomePage";
 
@@ -53,6 +56,16 @@ export const router = createBrowserRouter([
         path: "welcome-seller",
         element: <SellerWelcomePage />,
       },
+      {
+        path: "lots",
+        element: <LotsForBuyers />,
+        children: [
+          {
+            path: ":id",
+            element: <LotDetail />,
+          },
+        ],
+      },
       // {
       //   path: "seller",
       //   element: <PrivateOutlet />,
@@ -62,7 +75,7 @@ export const router = createBrowserRouter([
       //       element: <Lots />,
       //     },
       //   ],
-      // },
+      // }
     ],
   },
   {
