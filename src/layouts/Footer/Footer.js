@@ -1,29 +1,26 @@
 import React from "react";
 
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import IconButton from "@mui/material/IconButton";
 import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
-import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 
 import FacebookIcon from "@mui/icons-material/GitHub";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import TwitterIcon from "@mui/icons-material/X";
 
-
-// const logoStyle = {
-//   width: "140px",
-//   height: "auto",
-// };
+const logoStyle = {
+  width: "140px",
+  height: "auto",
+};
 
 const Copyright = () => {
   return (
     <Typography variant="body2" color="text.secondary" mt={1}>
       {"Copyright © "}
-      <Link href="#">Hrunytsky Dmytro&nbsp;</Link>
+      <Link href="#">Дмитро Груницький&nbsp;</Link>
       {new Date().getFullYear()}
     </Typography>
   );
@@ -46,7 +43,7 @@ const Footer = () => {
           display: "flex",
           flexDirection: { xs: "column", sm: "row" },
           width: "100%",
-          justifyContent: "space-between",
+          justifyContent: "space-around",
         }}
       >
         <Box
@@ -58,18 +55,18 @@ const Footer = () => {
           }}
         >
           <Box sx={{ width: { xs: "100%", sm: "60%" } }}>
-            <Box sx={{ ml: "-15px" }}>
-              <Typography
-                variant="h6"
-                fontWeight={600}
-                sx={{ color: "#01579b" }}
-              >
-                <Link href="/main" underline="hover">
-                  AUCTION-THINGS
-                </Link>
-              </Typography>
+            <Box sx={{ mt: "80px", ml: "-15px" }}>
+              <Link href="/main" underline="hover">
+                <Typography
+                  variant="h6"
+                  fontWeight={600}
+                  sx={{ color: "#01579b" }}
+                >
+                  <img src="/logo.png" style={logoStyle} alt="Логотип" />
+                </Typography>
+              </Link>
             </Box>
-            <Typography variant="body2" fontWeight={600} gutterBottom>
+            {/* <Typography variant="body2" fontWeight={600} gutterBottom>
               Newsletter
             </Typography>
             <Typography variant="body2" color="text.secondary" mb={2}>
@@ -96,7 +93,7 @@ const Footer = () => {
               >
                 Subscribe
               </Button>
-            </Stack>
+            </Stack> */}
           </Box>
         </Box>
         <Box
@@ -107,22 +104,16 @@ const Footer = () => {
           }}
         >
           <Typography variant="body2" fontWeight={600}>
-            Product
+            Продукт
           </Typography>
           <Link color="text.secondary" href="#">
-            Lots
+            Лоти
           </Link>
           <Link color="text.secondary" href="#">
-            Testimonials
+            Продати на Bid&Win
           </Link>
           <Link color="text.secondary" href="#">
-            Highlights
-          </Link>
-          <Link color="text.secondary" href="#">
-            Pricing
-          </Link>
-          <Link color="text.secondary" href="#">
-            FAQs
+            Поради щодо купівлі
           </Link>
         </Box>
         <Box
@@ -133,16 +124,10 @@ const Footer = () => {
           }}
         >
           <Typography variant="body2" fontWeight={600}>
-            Company
+            Компанія
           </Typography>
           <Link color="text.secondary" href="#">
-            About us
-          </Link>
-          <Link color="text.secondary" href="#">
-            Careers
-          </Link>
-          <Link color="text.secondary" href="#">
-            Press
+            Про нас
           </Link>
         </Box>
         <Box
@@ -153,16 +138,16 @@ const Footer = () => {
           }}
         >
           <Typography variant="body2" fontWeight={600}>
-            Legal
+            Правові
           </Typography>
           <Link color="text.secondary" href="#">
-            Terms
+            Умови
           </Link>
           <Link color="text.secondary" href="#">
-            Privacy
+            Конфіденційність
           </Link>
           <Link color="text.secondary" href="#">
-            Contact
+            Контакти
           </Link>
         </Box>
       </Box>
@@ -178,13 +163,13 @@ const Footer = () => {
       >
         <div>
           <Link color="text.secondary" href="#">
-            Privacy Policy
+            Політика конфіденційності
           </Link>
           <Typography display="inline" sx={{ mx: 0.5, opacity: 0.5 }}>
             &nbsp;•&nbsp;
           </Typography>
           <Link color="text.secondary" href="#">
-            Terms of Service
+            Умови надання послуг
           </Link>
           <Copyright />
         </div>
