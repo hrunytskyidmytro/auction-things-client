@@ -50,7 +50,7 @@ export default function MoreInfo() {
         fontWeight={600}
         sx={{ color: "#01579b", mt: 15, textAlign: "center" }}
       >
-        Free Lots || {user?.firstName}
+        {user?.firstName}
       </Typography>
       <Stack
         direction="row"
