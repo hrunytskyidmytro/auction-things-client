@@ -103,6 +103,7 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
       <AppBar
         position="fixed"
         sx={{
+          zIndex: 1,
           boxShadow: 0,
           bgcolor: "transparent",
           backgroundImage: "none",
