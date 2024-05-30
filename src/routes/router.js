@@ -58,8 +58,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "lots",
-        element: <LotsForBuyers />,
         children: [
+          {
+            index: true,
+            element: <LotsForBuyers />,
+          },
           {
             path: ":id",
             element: <LotDetail />,
