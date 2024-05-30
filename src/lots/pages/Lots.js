@@ -18,6 +18,7 @@ import {
 } from "@mui/material";
 import { red, green, grey, yellow } from "@mui/material/colors";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import ShareIcon from "@mui/icons-material/Share";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 
@@ -204,7 +205,7 @@ const LotsForBuyers = () => {
                 </CardContent>
                 <StyledCardActions disableSpacing>
                   <IconButton aria-label="add to favorites">
-                    <FavoriteIcon />
+                    <FavoriteBorderIcon />
                   </IconButton>
                   <IconButton aria-label="share">
                     <ShareIcon />
