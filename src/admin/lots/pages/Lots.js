@@ -319,10 +319,10 @@ const Lots = () => {
       >
         <Box sx={style}>
           <Typography variant="h6" gutterBottom>
-            Видалити лот?
+            Видалити лот/и?
           </Typography>
           <Typography variant="body2">
-            Ви впевнені, що хочете видалити цей лот? Ця дія є незворотньою.
+            Ви впевнені, що хочете видалити цей лот/и? Ця дія є незворотньою.
           </Typography>
           {isDeletingLots ? (
             <Box sx={{ mt: 2, display: "flex", justifyContent: "center" }}>
