@@ -1,8 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
-import { useGetLotByIdQuery } from "../../api/lotApi";
+import {
+  useGetLotByIdQuery,
+  useGetLotBidsQuery,
+  useCloseLotMutation,
+} from "../../api/lotApi";
 import { useCreateBidMutation } from "../../api/bidApi";
+import { useAddToWatchlistMutation } from "../../api/watchlistApi";
+
+import { useAuth } from "../../shared/hooks/useAuth";
 
 import {
   Card,
@@ -19,39 +26,60 @@ import {
   Chip,
   Paper,
   Divider,
-  Snackbar,
-  Alert,
   Skeleton,
+  CircularProgress,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
 } from "@mui/material";
+import LoadingButton from "@mui/lab/LoadingButton";
 import { red, grey, orange } from "@mui/material/colors";
 import { format } from "date-fns";
+
+import GavelIcon from "@mui/icons-material/Gavel";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
+import LocalOfferIcon from "@mui/icons-material/LocalOffer";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import PersonIcon from "@mui/icons-material/Person";
+
+import { Carousel } from "react-responsive-carousel";
+import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 // import Fancybox from "../components/FancyBox";
 // import { Fancybox } from "@fancyapps/ui";
 
 import Breadcrumbs from "../../shared/components/UIElements/Breadcrumbs";
-
-import { Carousel } from "react-responsive-carousel";
-import "react-responsive-carousel/lib/styles/carousel.min.css";
-
-import GavelIcon from "@mui/icons-material/Gavel";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
-import LocalOfferIcon from "@mui/icons-material/LocalOffer";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import MessageSnackbar from "../../shared/components/UIElements/MessageSnackbar";
 
 const LotDetail = () => {
   const { id } = useParams();
-  const { data: lot, isLoading, error, refetch } = useGetLotByIdQuery(id);
 
-  const [createBid, { isLoading: isCreatingBid, isError: isErrorBid }] =
-    useCreateBidMutation();
+  const {
+    data: lot,
+    isLoading: isLoadingLot,
+    error: errorLot,
+    refetch: refetchLot,
+  } = useGetLotByIdQuery(id);
+  const {
+    data: bidsData,
+    error: errorBids,
+    refetch: refetchBids,
+  } = useGetLotBidsQuery(id);
+
+  const [createBid, { isLoading: isCreatingBid }] = useCreateBidMutation();
+  const [closeLot, { isLoading: isLoadingCloseLot }] = useCloseLotMutation(id);
+  const [addToWatchlist, { isLoading: isLoadingWatchlist }] =
+    useAddToWatchlistMutation();
+
+  const { user } = useAuth();
 
   const [openErrorAlert, setOpenErrorAlert] = useState(false);
+  const [openSuccessAlert, setOpenSuccessAlert] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [timeLeft, setTimeLeft] = useState("");
   const [timeLeftColor, setTimeLeftColor] = useState(grey[700]);
 
@@ -59,13 +87,40 @@ const LotDetail = () => {
   const [showBidModal, setShowBidModal] = useState(false);
   const [bidAmount, setBidAmount] = useState("");
 
+  const [intervalId, setIntervalId] = useState(null);
+  const [isIntervalActive, setIsIntervalActive] = useState(true);
+  const [isEmailSent, setIsEmailSent] = useState(
+    localStorage.getItem("isEmailSent") === "true" ? true : false
+  );
+
+  const [isLotEnded, setIsLotEnded] = useState(false);
+
+  const [isWatchlistAdded, setIsWatchlistAdded] = useState(false);
+
   useEffect(() => {
-    if (error || isErrorBid) {
+    if (lot && lot.endDate) {
+      const endDate = new Date(lot.endDate);
+      const now = new Date();
+      setIsLotEnded(endDate <= now);
+    }
+  }, [lot]);
+
+  useEffect(() => {
+    if (errorLot || errorBids) {
+      setErrorMessage(
+        errorLot?.data?.message ||
+          errorBids?.data?.message ||
+          "Виникла помилка. Будь ласка, спробуйте ще раз."
+      );
       setOpenErrorAlert(true);
     }
+  }, [errorLot, errorBids]);
 
-    if (lot && lot.endDate) {
-      const interval = setInterval(() => {
+  useEffect(() => {
+    let newIntervalId;
+
+    if (lot && lot.endDate && isIntervalActive) {
+      newIntervalId = setInterval(() => {
         const endDate = new Date(lot.endDate);
         const now = new Date();
         const difference = endDate - now;
@@ -73,7 +128,8 @@ const LotDetail = () => {
         if (difference <= 0) {
           setTimeLeft("Лот завершено.");
           setTimeLeftColor(red[500]);
-          clearInterval(interval);
+          clearInterval(newIntervalId);
+          handleCloseLot();
         } else {
           const days = Math.floor(difference / (1000 * 60 * 60 * 24));
           const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
@@ -90,35 +146,18 @@ const LotDetail = () => {
           }
         }
       }, 1000);
-
-      return () => clearInterval(interval);
     }
-  }, [error, isErrorBid, lot]);
 
-  if (isLoading) {
+    setIntervalId(newIntervalId);
+
+    return () => clearInterval(newIntervalId);
+  }, [lot, isIntervalActive]);
+
+  if (isLoadingLot) {
     return (
       <Container sx={{ mt: "8%" }}>
         <Skeleton variant="rectangular" width="100%" height="700px" />
       </Container>
-    );
-  }
-
-  if (error || isErrorBid) {
-    return (
-      <Snackbar
-        open={openErrorAlert}
-        autoHideDuration={5000}
-        onClose={() => setOpenErrorAlert(false)}
-      >
-        <Alert
-          onClose={() => setOpenErrorAlert(false)}
-          severity="error"
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {error?.data?.message || isErrorBid?.data?.message}
-        </Alert>
-      </Snackbar>
     );
   }
 
@@ -130,10 +169,12 @@ const LotDetail = () => {
 
   const handleToggleBids = () => {
     setShowBids(!showBids);
+    setIsIntervalActive(!showBids);
   };
 
   const handleToggleBidModal = () => {
     setShowBidModal(!showBidModal);
+    setIsIntervalActive(!showBidModal);
   };
 
   const handleBidChange = (e) => {
@@ -147,14 +188,60 @@ const LotDetail = () => {
     // }
 
     try {
-      await createBid({ lotId: id, amount: bidAmount }).unwrap();
-      refetch();
-      alert("Ставка успішно зроблена!");
+      const response = await createBid({
+        amount: bidAmount,
+        lotId: id,
+      }).unwrap();
+      refetchLot();
+      refetchBids();
       setShowBidModal(false);
+      setOpenSuccessAlert(true);
+      setSuccessMessage(response.message);
     } catch (error) {
       setOpenErrorAlert(true);
-      console.log("Не вдалося зробити ставку", error);
-      alert("Не вдалося зробити ставку. Спробуйте ще раз.");
+      setErrorMessage(
+        error.data.message || "Виникла помилка. Будь ласка, спробуйте ще раз."
+      );
+    } finally {
+      setIsIntervalActive(true);
+    }
+  };
+
+  const handleCloseLot = async () => {
+    if (!id || !lot || lot.endDate <= new Date()) {
+      console.error("Пропущено ідентифікатор лоту або лот вже закритий.");
+      return;
+    }
+    try {
+      clearInterval(intervalId);
+      if (!isEmailSent) {
+        await closeLot(id).unwrap();
+        setSuccessMessage(
+          "Лот завершився. Листи з результатами розіслані на вашу поштову скриньку. Будь ласка, перевірте свою електронну пошту для отримання додаткової інформації."
+        );
+        setOpenSuccessAlert(true);
+        setIsEmailSent(true);
+        localStorage.setItem("isEmailSent", "true");
+        refetchLot();
+      }
+    } catch (error) {
+      console.error("Помилка при закритті лоту:", error);
+      setOpenErrorAlert(true);
+      setErrorMessage(
+        error.data.message || "Виникла помилка при закритті лоту."
+      );
+    }
+  };
+
+  const handleAddToWatchlist = async () => {
+    try {
+      await addToWatchlist({ userId: user.id, lotId: id }).unwrap();
+      setIsWatchlistAdded(true);
+    } catch (error) {
+      setOpenErrorAlert(true);
+      setErrorMessage(
+        error.data.message || "Виникла помилка. Будь ласка, спробуйте ще раз."
+      );
     }
   };
 
@@ -164,6 +251,18 @@ const LotDetail = () => {
         py: { xs: 8, sm: 16 },
       }}
     >
+      <MessageSnackbar
+        open={openErrorAlert}
+        onClose={() => setOpenErrorAlert(false)}
+        severity="error"
+        message={errorMessage}
+      />
+      <MessageSnackbar
+        open={openSuccessAlert}
+        onClose={() => setOpenSuccessAlert(false)}
+        severity="success"
+        message={successMessage}
+      />
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <Box sx={{ mt: 5 }}>
@@ -195,7 +294,6 @@ const LotDetail = () => {
                       width: "100%",
                       maxHeight: "500px",
                       objectFit: "cover",
-                      marginBottom: "8px",
                       cursor: "pointer",
                     }}
                   />
@@ -275,9 +373,9 @@ const LotDetail = () => {
                   >
                     Кількість зроблених ставок: {lot.bidCount}
                   </Typography>
-                  {showBids && (
+                  {lot && lot.bidCount > 0 && (
                     <Button variant="text" onClick={handleToggleBids}>
-                      {showBids ? "Приховати ставки" : "Переглянути всі ставки"}
+                      Переглянути всі ставки
                     </Button>
                   )}
                 </Box>
@@ -314,27 +412,42 @@ const LotDetail = () => {
                   {timeLeft}
                 </Typography>
               </Paper>
-              <Divider sx={{ my: 2 }} />
-              <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  startIcon={<GavelIcon />}
-                  onClick={handleToggleBidModal}
-                >
-                  Зробити ставку
-                </Button>
-                <Button variant="contained" color="secondary">
-                  Купити зараз за {lot.buyNowPrice} грн.
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  startIcon={<FavoriteBorderIcon />}
-                >
-                  Додати в список відстеження
-                </Button>
-              </Stack>
+              {!isLotEnded && (
+                <>
+                  <Divider sx={{ my: 2 }} />
+                  <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      startIcon={<GavelIcon />}
+                      onClick={handleToggleBidModal}
+                    >
+                      Зробити ставку
+                    </Button>
+                    <Button variant="contained" color="secondary">
+                      Купити зараз за {lot.buyNowPrice} грн.
+                    </Button>
+                    <LoadingButton
+                      variant="outlined"
+                      color="primary"
+                      startIcon={
+                        isWatchlistAdded ? (
+                          <FavoriteIcon />
+                        ) : (
+                          <FavoriteBorderIcon />
+                        )
+                      }
+                      disabled={isWatchlistAdded}
+                      loading={isLoadingWatchlist}
+                      onClick={handleAddToWatchlist}
+                    >
+                      {isWatchlistAdded
+                        ? "У списку відстеження"
+                        : "Додати в список відстеження"}
+                    </LoadingButton>
+                  </Stack>
+                </>
+              )}
             </CardContent>
           </Card>
         </Grid>
@@ -351,13 +464,35 @@ const LotDetail = () => {
       </Grid>
       {showBids && (
         <Dialog open={showBids} onClose={handleToggleBids}>
-          <DialogTitle>Ставки для лоту {lot.title}</DialogTitle>
+          <DialogTitle>Історія ставок для лоту "{lot.title}"</DialogTitle>
           <DialogContent>
-            {/* {lot.bids.map((bid, index) => (
-              <Typography key={index} variant="body1">
-                {bid.user}: {bid.amount} грн
-              </Typography>
-            ))} */}
+            {bidsData ? (
+              bidsData.map((bid, index) => (
+                <Card key={index} sx={{ mb: 2 }}>
+                  <CardContent>
+                    <Typography variant="h6" sx={{ mb: 1 }}>
+                      <PersonIcon sx={{ mr: 1 }} />
+                      {bid.User.firstName} {bid.User.lastName}
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      color="text.secondary"
+                      sx={{ mb: 1 }}
+                    >
+                      Сума: {bid.amount} грн
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Дата:{" "}
+                      {format(new Date(bid.createdAt), "dd.MM.yyyy HH:mm")}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <Box sx={{ mt: 2, display: "flex", justifyContent: "center" }}>
+                <CircularProgress size={30} thickness={3.6} />
+              </Box>
+            )}
           </DialogContent>
           <DialogActions>
             <Button onClick={handleToggleBids} color="primary">

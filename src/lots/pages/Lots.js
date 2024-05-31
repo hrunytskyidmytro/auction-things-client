@@ -36,6 +36,7 @@ const StyledCard = styled(Card)({
   justifyContent: "space-between",
   flexGrow: 1,
   p: 1,
+  height: "530px",
 });
 
 const StyledImage = styled("img")({
