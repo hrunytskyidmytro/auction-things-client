@@ -37,6 +37,18 @@ export const lotApi = createApi({
         method: "GET",
       }),
     }),
+    getLotBids: builder.query({
+      query: (id) => ({
+        url: `/${id}/bids`,
+        method: "GET",
+      }),
+    }),
+    closeLot: builder.mutation({
+      query: (id) => ({
+        url: `/${id}/close`,
+        method: "PATCH",
+      }),
+    }),
   }),
 });
 
@@ -46,4 +58,6 @@ export const {
   useDeleteLotMutation,
   useGetLotByIdQuery,
   useGetAllLotsQuery,
+  useGetLotBidsQuery,
+  useCloseLotMutation,
 } = lotApi;
