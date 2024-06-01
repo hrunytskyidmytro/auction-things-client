@@ -136,7 +136,6 @@ const LotsForBuyers = () => {
       <Box
         sx={{
           width: { sm: "100%", md: "100%" },
-          //   textAlign: { sm: "left", md: "center" },
         }}
       >
         <Grid container spacing={3} justifyContent="center" sx={{ mt: 15 }}>
@@ -152,11 +151,6 @@ const LotsForBuyers = () => {
                         `${lot.creator?.firstName} ${lot.creator?.lastName}`
                       )}
                     />
-                  }
-                  action={
-                    <IconButton aria-label="settings">
-                      <MoreVertIcon />
-                    </IconButton>
                   }
                   title={
                     `${lot.creator?.firstName} ${lot.creator?.lastName}` || (
