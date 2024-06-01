@@ -1,39 +1,36 @@
-import { createApi } from "@reduxjs/toolkit/query/react";
-import { baseQueryWithJwt } from "./baseQueryWithToken";
+import { api } from "./api";
 
-export const bidApi = createApi({
-  reducerPath: "bidApi",
-  baseQuery: baseQueryWithJwt("/bids"),
+export const bidApi = api.injectEndpoints({
   endpoints: (builder) => ({
     createBid: builder.mutation({
       query: (data) => ({
-        url: "/",
+        url: "/bids/",
         method: "POST",
         body: data,
       }),
     }),
     updateBid: builder.mutation({
       query: ({ id, ...data }) => ({
-        url: `/${id}`,
+        url: `/bids/${id}`,
         method: "PATCH",
         body: data,
       }),
     }),
     deleteBid: builder.mutation({
       query: (id) => ({
-        url: `/${id}`,
+        url: `/bids/${id}`,
         method: "DELETE",
       }),
     }),
     getBidById: builder.query({
       query: (id) => ({
-        url: `/${id}`,
+        url: `/bids/${id}`,
         method: "GET",
       }),
     }),
     getAllBids: builder.query({
       query: () => ({
-        url: "/",
+        url: "/bids/",
         method: "GET",
       }),
     }),

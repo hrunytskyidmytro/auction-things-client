@@ -1,25 +1,33 @@
-import { createApi } from "@reduxjs/toolkit/query/react";
-import { baseQueryWithJwt } from "./baseQueryWithToken";
+import { api } from "./api";
 
-export const watchlistApi = createApi({
-  reducerPath: "watchlistApi",
-  baseQuery: baseQueryWithJwt("/watchlists"),
+export const watchlistApi = api.injectEndpoints({
   endpoints: (builder) => ({
     addToWatchlist: builder.mutation({
+      invalidatesTags: ["Watchlist"],
       query: (data) => ({
-        url: "/add",
+        url: "/watchlists/add",
         method: "POST",
         body: data,
       }),
     }),
     getWatchlistByUserId: builder.query({
       query: (userId) => ({
-        url: `/${userId}`,
+        url: `/watchlists/${userId}`,
+        method: "GET",
+      }),
+    }),
+    checkWatchlistExist: builder.query({
+      providesTags: ["Watchlist"],
+      query: (lotId) => ({
+        url: `/watchlists/${lotId}/check-exist`,
         method: "GET",
       }),
     }),
   }),
 });
 
-export const { useAddToWatchlistMutation, useGetWatchlistByUserIdQuery } =
-  watchlistApi;
+export const {
+  useAddToWatchlistMutation,
+  useGetWatchlistByUserIdQuery,
+  useCheckWatchlistExistQuery,
+} = watchlistApi;

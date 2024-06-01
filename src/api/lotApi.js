@@ -1,52 +1,43 @@
-import { createApi } from "@reduxjs/toolkit/query/react";
-import { baseQueryWithJwt } from "./baseQueryWithToken";
+import { api } from "./api";
 
-export const lotApi = createApi({
-  reducerPath: "lotApi",
-  baseQuery: baseQueryWithJwt("/lots"),
+export const lotApi = api.injectEndpoints({
   endpoints: (builder) => ({
     createLot: builder.mutation({
       query: (data) => ({
-        url: "/",
+        url: "/lots/",
         method: "POST",
         body: data,
       }),
     }),
     updateLot: builder.mutation({
       query: ({ id, ...data }) => ({
-        url: `/${id}`,
+        url: `/lots/${id}`,
         method: "PATCH",
         body: data,
       }),
     }),
     deleteLot: builder.mutation({
       query: (id) => ({
-        url: `/${id}`,
+        url: `/lots/${id}`,
         method: "DELETE",
       }),
     }),
     getLotById: builder.query({
       query: (id) => ({
-        url: `/${id}`,
+        url: `/lots/${id}`,
         method: "GET",
       }),
     }),
     getAllLots: builder.query({
       query: () => ({
-        url: "/",
+        url: "/lots/",
         method: "GET",
       }),
     }),
     getLotBids: builder.query({
       query: (id) => ({
-        url: `/${id}/bids`,
+        url: `/lots/${id}/bids`,
         method: "GET",
-      }),
-    }),
-    closeLot: builder.mutation({
-      query: (id) => ({
-        url: `/${id}/close`,
-        method: "PATCH",
       }),
     }),
   }),
@@ -59,5 +50,4 @@ export const {
   useGetLotByIdQuery,
   useGetAllLotsQuery,
   useGetLotBidsQuery,
-  useCloseLotMutation,
 } = lotApi;

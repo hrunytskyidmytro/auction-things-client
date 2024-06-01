@@ -1,39 +1,36 @@
-import { createApi } from "@reduxjs/toolkit/query/react";
-import { baseQueryWithJwt } from "./baseQueryWithToken";
+import { api } from "./api";
 
-export const categoryApi = createApi({
-  reducerPath: "categoryApi",
-  baseQuery: baseQueryWithJwt("/categories"),
+export const categoryApi = api.injectEndpoints({
   endpoints: (builder) => ({
     createCategory: builder.mutation({
       query: (data) => ({
-        url: "/",
+        url: "/categories/",
         method: "POST",
         body: data,
       }),
     }),
     updateCategory: builder.mutation({
       query: ({ id, ...data }) => ({
-        url: `/${id}`,
+        url: `/categories/${id}`,
         method: "PATCH",
         body: data,
       }),
     }),
     deleteCategory: builder.mutation({
       query: (id) => ({
-        url: `/${id}`,
+        url: `/categories/${id}`,
         method: "DELETE",
       }),
     }),
     getCategoryById: builder.query({
       query: (id) => ({
-        url: `/${id}`,
+        url: `/categories/${id}`,
         method: "GET",
       }),
     }),
     getAllCategories: builder.query({
       query: () => ({
-        url: "/",
+        url: "/categories/",
         method: "GET",
       }),
     }),

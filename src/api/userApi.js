@@ -1,53 +1,50 @@
-import { createApi } from "@reduxjs/toolkit/query/react";
-import { baseQueryWithJwt } from "./baseQueryWithToken";
+import { api } from "./api";
 
-export const userApi = createApi({
-  reducerPath: "userApi",
-  baseQuery: baseQueryWithJwt("/user"),
+export const userApi = api.injectEndpoints({
   endpoints: (builder) => ({
     loginUser: builder.mutation({
       query: (data) => ({
-        url: "/login",
+        url: "/user/login",
         method: "POST",
         body: data,
       }),
     }),
     createUser: builder.mutation({
       query: (data) => ({
-        url: "/signup",
+        url: "/user/signup",
         method: "POST",
         body: data,
       }),
     }),
     checkPinCode: builder.mutation({
       query: (data) => ({
-        url: "/check-pin-code",
+        url: "/user/check-pin-code",
         method: "POST",
         body: data,
       }),
     }),
     resendPinCode: builder.mutation({
       query: (data) => ({
-        url: "/resend-pin-code",
+        url: "/user/resend-pin-code",
         method: "POST",
         body: data,
       }),
     }),
     getCurrentUserInfo: builder.query({
       query: () => ({
-        url: "/current-user",
+        url: "/user/current-user",
         method: "GET",
       }),
     }),
     getAllUsers: builder.query({
       query: () => ({
-        url: "/",
+        url: "/user/",
         method: "GET",
       }),
     }),
     deleteUser: builder.mutation({
       query: (id) => ({
-        url: `/${id}`,
+        url: `/user/${id}`,
         method: "DELETE",
       }),
     }),
