@@ -25,6 +25,7 @@ const UpdateLot = () => {
     isLoading: isFetching,
     error: fetchError,
   } = useGetLotByIdQuery(id);
+  
   const [updateLot, { isLoading, error }] = useUpdateLotMutation();
 
   const navigate = useNavigate();
