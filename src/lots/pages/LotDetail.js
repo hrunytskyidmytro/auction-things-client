@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
-import {
-  useGetLotByIdQuery,
-  useGetLotBidsQuery,
-  useCloseLotMutation,
-} from "../../api/lotApi";
+import { useGetLotByIdQuery, useGetLotBidsQuery } from "../../api/lotApi";
 import { useCreateBidMutation } from "../../api/bidApi";
-import { useAddToWatchlistMutation } from "../../api/watchlistApi";
+import {
+  useAddToWatchlistMutation,
+  useCheckWatchlistExistQuery,
+} from "../../api/watchlistApi";
 
 import { useAuth } from "../../shared/hooks/useAuth";
 
@@ -48,7 +47,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 
-// import Fancybox from "../components/FancyBox";
+import Fancybox from "../components/FancyBox";
 // import { Fancybox } from "@fancyapps/ui";
 
 import Breadcrumbs from "../../shared/components/UIElements/Breadcrumbs";
@@ -59,10 +58,11 @@ const LotDetail = () => {
 
   const {
     data: lot,
-    isLoading: isLoadingLot,
+    isFetching: isFetchingLot,
     error: errorLot,
     refetch: refetchLot,
   } = useGetLotByIdQuery(id);
+
   const {
     data: bidsData,
     error: errorBids,
@@ -70,9 +70,11 @@ const LotDetail = () => {
   } = useGetLotBidsQuery(id);
 
   const [createBid, { isLoading: isCreatingBid }] = useCreateBidMutation();
-  const [closeLot, { isLoading: isLoadingCloseLot }] = useCloseLotMutation(id);
+
   const [addToWatchlist, { isLoading: isLoadingWatchlist }] =
     useAddToWatchlistMutation();
+
+  const { data: checkWatchlistExist } = useCheckWatchlistExistQuery(id);
 
   const { user } = useAuth();
 
@@ -86,12 +88,6 @@ const LotDetail = () => {
   const [showBids, setShowBids] = useState(false);
   const [showBidModal, setShowBidModal] = useState(false);
   const [bidAmount, setBidAmount] = useState("");
-
-  const [intervalId, setIntervalId] = useState(null);
-  const [isIntervalActive, setIsIntervalActive] = useState(true);
-  const [isEmailSent, setIsEmailSent] = useState(
-    localStorage.getItem("isEmailSent") === "true" ? true : false
-  );
 
   const [isLotEnded, setIsLotEnded] = useState(false);
 
@@ -119,17 +115,17 @@ const LotDetail = () => {
   useEffect(() => {
     let newIntervalId;
 
-    if (lot && lot.endDate && isIntervalActive) {
-      newIntervalId = setInterval(() => {
+    if (lot && lot.endDate) {
+      const newIntervalId = setInterval(() => {
         const endDate = new Date(lot.endDate);
         const now = new Date();
         const difference = endDate - now;
 
-        if (difference <= 0) {
+        if (difference <= 0 || lot.status === "CLOSED") {
           setTimeLeft("Лот завершено.");
           setTimeLeftColor(red[500]);
-          clearInterval(newIntervalId);
           handleCloseLot();
+          clearInterval(newIntervalId);
         } else {
           const days = Math.floor(difference / (1000 * 60 * 60 * 24));
           const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
@@ -148,12 +144,10 @@ const LotDetail = () => {
       }, 1000);
     }
 
-    setIntervalId(newIntervalId);
-
     return () => clearInterval(newIntervalId);
-  }, [lot, isIntervalActive]);
+  }, [lot]);
 
-  if (isLoadingLot) {
+  if (isFetchingLot) {
     return (
       <Container sx={{ mt: "8%" }}>
         <Skeleton variant="rectangular" width="100%" height="700px" />
@@ -169,12 +163,10 @@ const LotDetail = () => {
 
   const handleToggleBids = () => {
     setShowBids(!showBids);
-    setIsIntervalActive(!showBids);
   };
 
   const handleToggleBidModal = () => {
     setShowBidModal(!showBidModal);
-    setIsIntervalActive(!showBidModal);
   };
 
   const handleBidChange = (e) => {
@@ -182,11 +174,6 @@ const LotDetail = () => {
   };
 
   const handlePlaceBid = async () => {
-    // if (!user) {
-    //   alert("Ви повинні бути авторизовані, щоб зробити ставку.");
-    //   return;
-    // }
-
     try {
       const response = await createBid({
         amount: bidAmount,
@@ -200,10 +187,8 @@ const LotDetail = () => {
     } catch (error) {
       setOpenErrorAlert(true);
       setErrorMessage(
-        error.data.message || "Виникла помилка. Будь ласка, спробуйте ще раз."
+        error?.data?.message || "Виникла помилка. Будь ласка, спробуйте ще раз."
       );
-    } finally {
-      setIsIntervalActive(true);
     }
   };
 
@@ -212,23 +197,19 @@ const LotDetail = () => {
       console.error("Пропущено ідентифікатор лоту або лот вже закритий.");
       return;
     }
+
     try {
-      clearInterval(intervalId);
-      if (!isEmailSent) {
-        await closeLot(id).unwrap();
+      if (lot.status !== "CLOSED") {
         setSuccessMessage(
           "Лот завершився. Листи з результатами розіслані на вашу поштову скриньку. Будь ласка, перевірте свою електронну пошту для отримання додаткової інформації."
         );
         setOpenSuccessAlert(true);
-        setIsEmailSent(true);
-        localStorage.setItem("isEmailSent", "true");
         refetchLot();
       }
     } catch (error) {
-      console.error("Помилка при закритті лоту:", error);
       setOpenErrorAlert(true);
       setErrorMessage(
-        error.data.message || "Виникла помилка при закритті лоту."
+        error?.data?.message || "Виникла помилка при закритті лоту."
       );
     }
   };
@@ -240,7 +221,7 @@ const LotDetail = () => {
     } catch (error) {
       setOpenErrorAlert(true);
       setErrorMessage(
-        error.data.message || "Виникла помилка. Будь ласка, спробуйте ще раз."
+        error?.data?.message || "Виникла помилка. Будь ласка, спробуйте ще раз."
       );
     }
   };
@@ -255,7 +236,9 @@ const LotDetail = () => {
         open={openErrorAlert}
         onClose={() => setOpenErrorAlert(false)}
         severity="error"
-        message={errorMessage}
+        message={
+          errorMessage || "Виникла помилка. Будь ласка, спробуйте ще раз."
+        }
       />
       <MessageSnackbar
         open={openSuccessAlert}
@@ -270,38 +253,45 @@ const LotDetail = () => {
               links={[
                 { label: "Bid&Win", url: "/" },
                 { label: "Лоти", url: "/lots" },
-                { label: lot.title, url: `/lots/${id}` },
+                { label: lot?.title, url: `/lots/${id}` },
               ]}
             />
           </Box>
         </Grid>
         <Grid item xs={12} md={6}>
-          {lot.imageUrls && lot.imageUrls.length > 0 && (
-            // <Fancybox>
-            <Carousel showStatus={false} autoPlay interval={3000} infiniteLoop>
-              {lot.imageUrls.map((url, index) => (
-                <div
-                  key={url}
-                  data-fancybox="gallery"
-                  data-src={`http://localhost:5001/${url}`}
-                  data-thumb-src={`http://localhost:5001/${url}`}
-                  data-caption={`Фото ${index + 1}`}
+          <Paper elevation={3} sx={{ p: 2, mb: 2 }}>
+            {lot.imageUrls && lot.imageUrls.length > 0 && (
+              <Fancybox>
+                <Carousel
+                  showStatus={false}
+                  autoPlay
+                  interval={3000}
+                  infiniteLoop
                 >
-                  <img
-                    src={`http://localhost:5001/${url}`}
-                    alt={`Фото ${index + 1}`}
-                    style={{
-                      width: "100%",
-                      maxHeight: "500px",
-                      objectFit: "cover",
-                      cursor: "pointer",
-                    }}
-                  />
-                </div>
-              ))}
-            </Carousel>
-            // </Fancybox>
-          )}
+                  {lot.imageUrls.map((url, index) => (
+                    <div
+                      key={url}
+                      data-fancybox="gallery"
+                      data-src={`http://localhost:5001/${url}`}
+                      data-thumb-src={`http://localhost:5001/${url}`}
+                      data-caption={`Фото ${index + 1}`}
+                    >
+                      <img
+                        src={`http://localhost:5001/${url}`}
+                        alt={`Фото ${index + 1}`}
+                        style={{
+                          width: "100%",
+                          maxHeight: "500px",
+                          objectFit: "cover",
+                          cursor: "pointer",
+                        }}
+                      />
+                    </div>
+                  ))}
+                </Carousel>
+              </Fancybox>
+            )}
+          </Paper>
         </Grid>
         <Grid item xs={12} md={6}>
           <Card>
@@ -431,17 +421,17 @@ const LotDetail = () => {
                       variant="outlined"
                       color="primary"
                       startIcon={
-                        isWatchlistAdded ? (
+                        checkWatchlistExist?.exist ? (
                           <FavoriteIcon />
                         ) : (
                           <FavoriteBorderIcon />
                         )
                       }
-                      disabled={isWatchlistAdded}
+                      disabled={checkWatchlistExist?.exist}
                       loading={isLoadingWatchlist}
                       onClick={handleAddToWatchlist}
                     >
-                      {isWatchlistAdded
+                      {checkWatchlistExist?.exist
                         ? "У списку відстеження"
                         : "Додати в список відстеження"}
                     </LoadingButton>
