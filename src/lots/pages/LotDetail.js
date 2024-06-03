@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
-import { useGetLotByIdQuery, useGetLotBidsQuery } from "../../api/lotApi";
+import {
+  useGetLotByIdQuery,
+  useGetLotBidsQuery,
+  useBuyLotNowMutation,
+} from "../../api/lotApi";
 import { useCreateBidMutation } from "../../api/bidApi";
 import {
   useAddToWatchlistMutation,
@@ -74,6 +78,8 @@ const LotDetail = () => {
   const [addToWatchlist, { isLoading: isLoadingWatchlist }] =
     useAddToWatchlistMutation();
 
+  const [buyLotNow, { isLoading: isBuyLotNow }] = useBuyLotNowMutation();
+
   const { data: checkWatchlistExist } = useCheckWatchlistExistQuery(id);
 
   const { user } = useAuth();
@@ -91,13 +97,11 @@ const LotDetail = () => {
 
   const [isLotEnded, setIsLotEnded] = useState(false);
 
-  const [isWatchlistAdded, setIsWatchlistAdded] = useState(false);
-
   useEffect(() => {
     if (lot && lot.endDate) {
       const endDate = new Date(lot.endDate);
       const now = new Date();
-      setIsLotEnded(endDate <= now);
+      setIsLotEnded(endDate <= now || lot.status === "CLOSED");
     }
   }, [lot]);
 
@@ -214,10 +218,24 @@ const LotDetail = () => {
     }
   };
 
+  const handleBuyNowClick = async () => {
+    try {
+      const response = await buyLotNow({ lotId: id, buyNow: true }).unwrap();
+      if (response.redirectUrl) {
+        window.location.href = response.redirectUrl;
+      }
+    } catch (error) {
+      setOpenErrorAlert(true);
+      setErrorMessage(
+        error?.data?.message ||
+          "Не вдалося здійснити купівлю. Будь ласка, спробуйте пізніше."
+      );
+    }
+  };
+
   const handleAddToWatchlist = async () => {
     try {
       await addToWatchlist({ userId: user.id, lotId: id }).unwrap();
-      setIsWatchlistAdded(true);
     } catch (error) {
       setOpenErrorAlert(true);
       setErrorMessage(
@@ -414,9 +432,14 @@ const LotDetail = () => {
                     >
                       Зробити ставку
                     </Button>
-                    <Button variant="contained" color="secondary">
+                    <LoadingButton
+                      variant="contained"
+                      color="secondary"
+                      loading={isBuyLotNow}
+                      onClick={handleBuyNowClick}
+                    >
                       Купити зараз за {lot.buyNowPrice} грн.
-                    </Button>
+                    </LoadingButton>
                     <LoadingButton
                       variant="outlined"
                       color="primary"

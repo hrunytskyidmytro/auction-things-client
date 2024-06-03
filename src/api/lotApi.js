@@ -40,6 +40,13 @@ export const lotApi = api.injectEndpoints({
         method: "GET",
       }),
     }),
+    buyLotNow: builder.mutation({
+      query: (data) => ({
+        url: `/lots/buy-now`,
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -50,4 +57,5 @@ export const {
   useGetLotByIdQuery,
   useGetAllLotsQuery,
   useGetLotBidsQuery,
+  useBuyLotNowMutation,
 } = lotApi;
