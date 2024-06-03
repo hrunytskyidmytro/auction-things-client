@@ -29,6 +29,7 @@ import PersonAdd from "@mui/icons-material/PersonAdd";
 import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
 import AdminPanelSettingsTwoToneIcon from "@mui/icons-material/AdminPanelSettingsTwoTone";
+import CreditCardIcon from "@mui/icons-material/CreditCard";
 
 import ToggleColorMode from "../../shared/components/ToggleColorMode";
 
@@ -289,10 +290,16 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
                       <Divider />
                       <MenuItem onClick={handleCloseUserMenu}>
                         <ListItemIcon>
-                          <PersonAdd fontSize="small" />
+                          <CreditCardIcon fontSize="small" />
                         </ListItemIcon>
-                        Додати новий аккаунт
+                        Баланс:{" "}
+                        <Chip
+                          label={`${user?.balance} грн.`}
+                          variant="outlined"
+                          sx={{ ml: 1 }}
+                        />
                       </MenuItem>
+                      <Divider />
                       {isAdmin && (
                         <MenuItem onClick={handleCloseMenuAndDrawer("/admin")}>
                           <ListItemIcon>

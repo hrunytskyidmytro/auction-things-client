@@ -2,6 +2,7 @@ import React from "react";
 import { createBrowserRouter } from "react-router-dom";
 
 import UserLayout from "../layouts/UserLayout/UserLayout";
+import AdminLayout from "../layouts/AdminLayout/pages/AdminLayout";
 import BasicLayout from "../layouts/BasicLayout/BasicLayout";
 
 import Login from "../user/pages/Login";
@@ -34,10 +35,12 @@ import LotDetail from "../lots/pages/LotDetail";
 
 import SellerWelcomePage from "../user/pages/SellerWelcomePage";
 
-import AdminLayout from "../layouts/AdminLayout/pages/AdminLayout";
-
 import { AnonymousOutlet } from "./AnonymousOutlet";
-// import { PrivateOutlet } from "../routes/PrivateOutlet";
+import { PrivateOutlet } from "../routes/PrivateOutlet";
+
+import PaymentPage from "../payments/pages/PaymentPage";
+import AddFundsPage from "../payments/pages/AddFundsPage";
+import WithdrawFundsForm from "../payments/pages/WithdrawFundsPage";
 
 export const router = createBrowserRouter([
   {
@@ -69,6 +72,7 @@ export const router = createBrowserRouter([
           },
         ],
       },
+
       // {
       //   path: "seller",
       //   element: <PrivateOutlet />,
@@ -84,6 +88,23 @@ export const router = createBrowserRouter([
   {
     element: <BasicLayout />,
     children: [
+      {
+        element: <PrivateOutlet />,
+        children: [
+          {
+            path: "payment",
+            element: <PaymentPage />,
+          },
+          {
+            path: "add-funds",
+            element: <AddFundsPage />,
+          },
+          {
+            path: "withdraw-funds",
+            element: <WithdrawFundsForm />,
+          },
+        ],
+      },
       {
         element: <AnonymousOutlet />,
         children: [
