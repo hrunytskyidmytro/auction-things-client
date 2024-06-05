@@ -41,6 +41,8 @@ import { PrivateOutlet } from "../routes/PrivateOutlet";
 import PaymentPage from "../payments/pages/PaymentPage";
 import AddFundsPage from "../payments/pages/AddFundsPage";
 import WithdrawFundsForm from "../payments/pages/WithdrawFundsPage";
+import BalanceActionPage from "../payments/pages/BalanceActionPage";
+import SuccessPage from "../payments/pages/SuccessPage";
 
 export const router = createBrowserRouter([
   {
@@ -102,6 +104,14 @@ export const router = createBrowserRouter([
           {
             path: "withdraw-funds",
             element: <WithdrawFundsForm />,
+          },
+          {
+            path: "change-balance-action",
+            element: <BalanceActionPage />,
+          },
+          {
+            path: "success-page",
+            element: <SuccessPage />,
           },
         ],
       },
