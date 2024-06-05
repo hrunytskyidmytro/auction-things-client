@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-
 import PropTypes from "prop-types";
 
 import {
@@ -18,8 +17,6 @@ import {
   Menu,
   IconButton,
   ListItemIcon,
-  Snackbar,
-  Alert,
   Chip,
 } from "@mui/material";
 import { blue } from "@mui/material/colors";
@@ -30,12 +27,16 @@ import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
 import AdminPanelSettingsTwoToneIcon from "@mui/icons-material/AdminPanelSettingsTwoTone";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
+import BookmarkIcon from "@mui/icons-material/Bookmark";
 
 import ToggleColorMode from "../../shared/components/ToggleColorMode";
+import MessageSnackbar from "../../shared/components/UIElements/MessageSnackbar";
+import WatchlistModal from "../../watchlists/components/WatchlistModal";
 
 import { Link as RouterLink, useNavigate } from "react-router-dom";
-
 import { useAuth } from "../../shared/hooks/useAuth";
+
+import { useGetWatchlistByUserIdQuery } from "../../api/watchlistApi";
 
 const logoStyle = {
   marginTop: "9px",
@@ -49,6 +50,8 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
   const [open, setOpen] = useState(false);
   const [anchorElUser, setAnchorElUser] = useState(null);
 
+  const [openWatchlistModal, setOpenWatchlistModal] = useState(false);
+
   const {
     isLoggedIn,
     logOut,
@@ -59,10 +62,12 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
     isSeller,
   } = useAuth();
 
+  const { data: watchlist } = useGetWatchlistByUserIdQuery(user?.id);
+
   const navigate = useNavigate();
 
-  const handleOpenUserMenu = (event) => {
-    setAnchorElUser(event.currentTarget);
+  const handleOpenUserMenu = (e) => {
+    setAnchorElUser(e.currentTarget);
   };
 
   const handleCloseUserMenu = () => {
@@ -85,19 +90,15 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
     };
   };
 
-  // const scrollToSection = (sectionId) => {
-  //   const sectionElement = document.getElementById(sectionId);
-  //   const offset = 128;
-  //   if (sectionElement) {
-  //     const targetScroll = sectionElement.offsetTop - offset;
-  //     sectionElement.scrollIntoView({ behavior: "smooth" });
-  //     window.scrollTo({
-  //       top: targetScroll,
-  //       behavior: "smooth",
-  //     });
-  //     setOpen(false);
-  //   }
-  // };
+  const handleOpenWatchlistModal = () => {
+    setOpenWatchlistModal(true);
+    handleCloseUserMenu();
+  };
+
+  const handleCloseWatchlistModal = () => {
+    setOpenWatchlistModal(false);
+    handleCloseUserMenu();
+  };
 
   return (
     <div>
@@ -288,7 +289,11 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
                         )}
                       </MenuItem>
                       <Divider />
-                      <MenuItem onClick={handleCloseUserMenu}>
+                      <MenuItem
+                        onClick={handleCloseMenuAndDrawer(
+                          "/change-balance-action"
+                        )}
+                      >
                         <ListItemIcon>
                           <CreditCardIcon fontSize="small" />
                         </ListItemIcon>
@@ -318,6 +323,12 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
                           Мої лоти
                         </MenuItem>
                       )}
+                      <MenuItem onClick={handleOpenWatchlistModal}>
+                        <ListItemIcon>
+                          <BookmarkIcon fontSize="small" />
+                        </ListItemIcon>
+                        Список відстеження
+                      </MenuItem>
                       <MenuItem onClick={handleCloseUserMenu}>
                         <ListItemIcon>
                           <Settings fontSize="small" />
@@ -520,20 +531,18 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
           </Toolbar>
         </Container>
       </AppBar>
-      <Snackbar
+      <WatchlistModal
+        openWatchlistModal={openWatchlistModal}
+        handleCloseWatchlistModal={handleCloseWatchlistModal}
+        watchlist={watchlist}
+        user={user}
+      />
+      <MessageSnackbar
         open={errorToken}
-        autoHideDuration={5000}
         onClose={() => setErrorToken(false)}
-      >
-        <Alert
-          onClose={() => setErrorToken(false)}
-          severity="error"
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          Час токену вийшов, будь ласка, авторизуйтесь знову.
-        </Alert>
-      </Snackbar>
+        severity="error"
+        message={"Час токену вийшов, будь ласка, авторизуйтесь знову."}
+      />
     </div>
   );
 };

@@ -32,6 +32,7 @@ export const lotApi = api.injectEndpoints({
       query: () => ({
         url: "/lots/",
         method: "GET",
+        // params: { page, limit },
       }),
     }),
     getLotBids: builder.query({

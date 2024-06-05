@@ -111,3 +111,4 @@ export const validationSchemaForNewLot = yup.object().shape({
   bidIncrement: yup.number(),
   reservePrice: yup.number(),
 });
+
