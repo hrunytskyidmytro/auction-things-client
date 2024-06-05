@@ -4,14 +4,10 @@ import Box from "@mui/material/Box";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import NavBar from "../NavBar/NavBar";
 import Footer from "../Footer/Footer";
-import getLPTheme from "../../shared/components/getLPTheme";
 import { Outlet } from "react-router-dom";
-
-const defaultTheme = createTheme();
 
 const UserLayout = () => {
   const [mode, setMode] = useState("light");
-  const LPtheme = createTheme(getLPTheme(mode));
   const defaultTheme = createTheme({ palette: { mode } });
 
   const toggleColorMode = () => {

@@ -9,9 +9,7 @@ import {
   Divider,
   IconButton,
   Badge,
-  Container,
   Link,
-  Grid,
 } from "@mui/material";
 
 import { mainListItems, secondaryListItems } from "../components/ListItems";
