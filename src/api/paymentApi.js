@@ -9,6 +9,13 @@ export const paymentApi = api.injectEndpoints({
         body: paymentData,
       }),
     }),
+    confirmPurchase: builder.mutation({
+      query: (lotId) => ({
+        url: "/payments/confirm-purchase",
+        method: "POST",
+        body: { lotId },
+      }),
+    }),
     addFunds: builder.mutation({
       query: ({ amount, payment_method_id }) => ({
         url: `/payments/add-funds`,
@@ -30,4 +37,5 @@ export const {
   useCreateCheckoutSessionMutation,
   useAddFundsMutation,
   useWithdrawFundsMutation,
+  useConfirmPurchaseMutation,
 } = paymentApi;
