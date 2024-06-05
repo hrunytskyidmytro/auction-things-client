@@ -1,9 +1,16 @@
 import React from "react";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import { Box } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
+import cardStyle from "../styles/cardElementStyles";
 
-const CheckoutForm = ({ amount, handlePayment }) => {
+const CheckoutForm = ({ handlePayment, isLoading }) => {
   const stripe = useStripe();
   const elements = useElements();
+
+  const cardOptions = {
+    style: cardStyle.style,
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -20,21 +27,30 @@ const CheckoutForm = ({ amount, handlePayment }) => {
     });
 
     if (error) {
-      console.error(error);
       handlePayment(null, error);
     } else {
       handlePayment(paymentMethod.id, null);
+      cardElement.clear();
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input type="text" value={amount} disabled />
-      <CardElement />
-      <button type="submit" disabled={!stripe}>
+    <Box component="form" onSubmit={handleSubmit}>
+      <Box component="section" sx={{ p: 2, border: "1px dashed grey" }}>
+        <CardElement options={cardOptions} />
+      </Box>
+      <LoadingButton
+        fullWidth
+        type="submit"
+        variant="contained"
+        color="primary"
+        sx={{ mt: 2 }}
+        loading={isLoading}
+        disabled={!stripe}
+      >
         Поповнити баланс
-      </button>
-    </form>
+      </LoadingButton>
+    </Box>
   );
 };
 

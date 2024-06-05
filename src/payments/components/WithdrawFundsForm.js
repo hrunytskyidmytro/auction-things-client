@@ -1,9 +1,16 @@
 import React from "react";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import { Box } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
+import cardStyle from "../styles/cardElementStyles";
 
-const WithdrawFundsForm = ({ amount, handleWithdraw }) => {
+const WithdrawFundsForm = ({ handleWithdraw, isLoading }) => {
   const stripe = useStripe();
   const elements = useElements();
+
+  const cardOptions = {
+    style: cardStyle.style,
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -20,21 +27,30 @@ const WithdrawFundsForm = ({ amount, handleWithdraw }) => {
     });
 
     if (error) {
-      console.error(error);
       handleWithdraw(null, error);
     } else {
       handleWithdraw(paymentMethod.id, null);
+      cardElement.clear();
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input type="text" value={amount} disabled />
-      <CardElement />
-      <button type="submit" disabled={!stripe}>
+    <Box component="form" onSubmit={handleSubmit}>
+      <Box component="section" sx={{ p: 2, border: "1px dashed grey" }}>
+        <CardElement options={cardOptions} />
+      </Box>
+      <LoadingButton
+        fullWidth
+        type="submit"
+        variant="contained"
+        color="primary"
+        sx={{ mt: 2 }}
+        loading={isLoading}
+        disabled={!stripe}
+      >
         Вивести кошти
-      </button>
-    </form>
+      </LoadingButton>
+    </Box>
   );
 };
 
