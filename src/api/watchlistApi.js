@@ -11,6 +11,7 @@ export const watchlistApi = api.injectEndpoints({
       }),
     }),
     getWatchlistByUserId: builder.query({
+      providesTags: ["Watchlist"],
       query: (userId) => ({
         url: `/watchlists/${userId}`,
         method: "GET",
@@ -23,6 +24,14 @@ export const watchlistApi = api.injectEndpoints({
         method: "GET",
       }),
     }),
+    deleteFromWatchlist: builder.mutation({
+      invalidatesTags: ["Watchlist"],
+      query: (data) => ({
+        url: "/watchlists/delete",
+        method: "DELETE",
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -30,4 +39,5 @@ export const {
   useAddToWatchlistMutation,
   useGetWatchlistByUserIdQuery,
   useCheckWatchlistExistQuery,
+  useDeleteFromWatchlistMutation
 } = watchlistApi;
