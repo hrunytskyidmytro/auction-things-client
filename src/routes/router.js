@@ -28,7 +28,9 @@ import Categories from "../admin/categories/pages/Categories";
 
 import Bids from "../admin/bids/pages/Bids";
 
-import MoreInfo from "../shared/components/MoreInfo";
+import Home from "../home/pages/Home";
+import CategoriesList from "../home/components/CategoriesList";
+import LotsPageByCategory from "../lots/pages/LotsPageByCategory";
 
 import LotsForBuyers from "../lots/pages/Lots";
 import LotDetail from "../lots/pages/LotDetail";
@@ -51,11 +53,14 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <MoreInfo />,
+        element: <Home />,
       },
       {
-        path: "user-profile",
-        element: <UserProfile />,
+        element: <CategoriesList />,
+      },
+      {
+        path: "/categories/:id",
+        element: <LotsPageByCategory />,
       },
       {
         path: "welcome-seller",
@@ -71,6 +76,15 @@ export const router = createBrowserRouter([
           {
             path: ":id",
             element: <LotDetail />,
+          },
+        ],
+      },
+      {
+        element: <PrivateOutlet />,
+        children: [
+          {
+            path: "user-profile",
+            element: <UserProfile />,
           },
         ],
       },
@@ -147,18 +161,18 @@ export const router = createBrowserRouter([
             path: "/auth/google/callback",
             element: <GoogleAuthCallback />,
           },
+        ],
+      },
+      {
+        path: "request-password-reset",
+        element: <RequestPasswordReset />,
+      },
+      {
+        path: "reset-password",
+        children: [
           {
-            path: "request-password-reset",
-            element: <RequestPasswordReset />,
-          },
-          {
-            path: "reset-password",
-            children: [
-              {
-                path: ":token",
-                element: <ResetPassword />,
-              },
-            ],
+            path: ":token",
+            element: <ResetPassword />,
           },
         ],
       },
