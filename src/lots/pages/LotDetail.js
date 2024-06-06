@@ -182,7 +182,6 @@ const LotDetail = () => {
       if (response.redirectUrl) {
         window.location.href = response.redirectUrl;
       }
-      // await createCheckoutSession({lotId: id}).unwrap();
       refetchLot();
     } catch (error) {
       setOpenErrorAlert(true);

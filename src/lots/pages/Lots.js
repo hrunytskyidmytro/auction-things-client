@@ -112,7 +112,7 @@ const LotsForBuyers = () => {
           {lots &&
             lots.map((lot) => (
               <Grid item xs={12} sm={6} md={4} lg={3} key={lot.id}>
-                <LotCard lot={lot} user={user} />
+                <LotCard lot={lot} />
               </Grid>
             ))}
           <Grid item xs={12}>

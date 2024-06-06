@@ -19,6 +19,7 @@ import {
   StyledImage,
   StyledCardActions,
 } from "../styles/cardStyles";
+import { useAuth } from "../../shared/hooks/useAuth";
 
 import { Link as RouterLink } from "react-router-dom";
 import { format } from "date-fns";
@@ -32,7 +33,8 @@ import {
   useDeleteFromWatchlistMutation,
 } from "../../api/watchlistApi";
 
-const LotCard = ({ lot, user }) => {
+const LotCard = ({ lot }) => {
+  const { user } = useAuth();
   const [addToWatchlist, { error: errorAdd, isLoading: isLoadingAdd }] =
     useAddToWatchlistMutation();
   const [
@@ -54,9 +56,15 @@ const LotCard = ({ lot, user }) => {
   const handleWatchlist = async () => {
     try {
       if (checkWatchlistExist?.exist) {
-        await deleteFromWatchlist({ userId: user.id, lotId: lot.id }).unwrap();
+        await deleteFromWatchlist({
+          userId: user.id,
+          lotId: lot.id,
+        }).unwrap();
       } else {
-        await addToWatchlist({ userId: user.id, lotId: lot.id }).unwrap();
+        await addToWatchlist({
+          userId: user.id,
+          lotId: lot.id,
+        }).unwrap();
       }
       refetchCheckWatchlistExist();
     } catch (error) {
