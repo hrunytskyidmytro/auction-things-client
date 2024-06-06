@@ -34,6 +34,12 @@ export const categoryApi = api.injectEndpoints({
         method: "GET",
       }),
     }),
+    getLotsByCategory: builder.query({
+      query: (categoryId) => ({
+        url: `/categories/${categoryId}/lots`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -43,4 +49,5 @@ export const {
   useDeleteCategoryMutation,
   useGetAllCategoriesQuery,
   useGetCategoryByIdQuery,
+  useGetLotsByCategoryQuery,
 } = categoryApi;
