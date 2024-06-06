@@ -42,6 +42,13 @@ export const userApi = api.injectEndpoints({
         method: "GET",
       }),
     }),
+    updateUser: builder.mutation({
+      query: ({ id, ...data }) => ({
+        url: `/user/${id}`,
+        method: "PATCH",
+        body: data,
+      }),
+    }),
     deleteUser: builder.mutation({
       query: (id) => ({
         url: `/user/${id}`,
@@ -58,5 +65,6 @@ export const {
   useResendPinCodeMutation,
   useLazyGetCurrentUserInfoQuery,
   useGetAllUsersQuery,
+  useUpdateUserMutation,
   useDeleteUserMutation,
 } = userApi;
