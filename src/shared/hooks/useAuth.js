@@ -24,7 +24,10 @@ export const useAuth = () => {
       getCurrentUser({ token })
         .unwrap()
         .then((res) => dispatch(setUser(res)))
-        .catch((error) => console.log(error));
+        .catch((error) => {
+          localStorage.removeItem("token");
+          dispatch(resetState());
+        });
     }
   }, [token, getCurrentUser]);
 
