@@ -112,3 +112,31 @@ export const validationSchemaForNewLot = yup.object().shape({
   reservePrice: yup.number(),
 });
 
+////////////////////////////////////////////////////////////////////////////
+
+export const validationSchemaForUserProfile = yup.object().shape({
+  firstName: yup
+    .string()
+    .min(2, "Ім'я повинно містити не менше 2 символів")
+    .max(32, "Ім'я не може містити більше 32 символів"),
+  lastName: yup
+    .string()
+    .min(2, "Прізвище повинно містити не менше 2 символів")
+    .max(32, "Прізвище не може містити більше 32 символів"),
+  patronymic: yup
+    .string()
+    .optional()
+    .required("Обов'язкове поле")
+    .min(2, "По-батькові повинно містити не менше 2 символів")
+    .max(32, "По-батькові не може містити більше 32 символів"),
+  email: yup.string().email("Невірний email"),
+  phoneNumber: yup
+    .string()
+    .optional()
+    .min(5, "Номер телефону повинно містити не менше 5 цифр")
+    .max(15, "Номер телефону не може містити більше 15 цифр"),
+  companySite: yup
+    .string()
+    .optional()
+    .url("Це повинно бути посилання на сайт."),
+});
