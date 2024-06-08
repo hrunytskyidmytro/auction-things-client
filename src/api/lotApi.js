@@ -29,11 +29,28 @@ export const lotApi = api.injectEndpoints({
       }),
     }),
     getAllLots: builder.query({
-      query: () => ({
-        url: "/lots/",
-        method: "GET",
-        // params: { page, limit },
-      }),
+      query: ({
+        page,
+        sortBy,
+        categoryId,
+        status,
+        currentPriceFrom,
+        currentPriceTo,
+        buyNowPriceFrom,
+        buyNowPriceTo,
+        dateOption,
+        search,
+      }) => {
+        const categoryIds = Array.isArray(categoryId)
+          ? categoryId.join(",")
+          : categoryId;
+        const statuses = Array.isArray(status) ? status.join(",") : status;
+
+        return {
+          url: `/lots/?page=${page}&sortBy=${sortBy}&categoryId=${categoryIds}&status=${statuses}&currentPriceFrom=${currentPriceFrom}&currentPriceTo=${currentPriceTo}&buyNowPriceFrom=${buyNowPriceFrom}&buyNowPriceTo=${buyNowPriceTo}&dateOption=${dateOption}&search=${search}`,
+          method: "GET",
+        };
+      },
     }),
     getLotBids: builder.query({
       query: (id) => ({
