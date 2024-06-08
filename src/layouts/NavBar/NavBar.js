@@ -18,6 +18,7 @@ import {
   IconButton,
   ListItemIcon,
   Chip,
+  alpha,
 } from "@mui/material";
 import { blue } from "@mui/material/colors";
 
@@ -105,7 +106,7 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
       <AppBar
         position="fixed"
         sx={{
-          zIndex: 1,
+          // zIndex: 1,
           boxShadow: 0,
           bgcolor: "transparent",
           backgroundImage: "none",
@@ -130,10 +131,14 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
               maxHeight: 40,
               border: "1px solid",
               borderColor: "divider",
+              // boxShadow:
+              //   theme.palette.mode === "light"
+              //     ? `0 0 1px rgba(85, 166, 246, 0.1), 1px 1.5px 2px -1px rgba(85, 166, 246, 0.15), 4px 4px 12px -2.5px rgba(85, 166, 246, 0.15)`
+              //     : "0 0 1px rgba(2, 31, 59, 0.7), 1px 1.5px 2px -1px rgba(2, 31, 59, 0.65), 4px 4px 12px -2.5px rgba(2, 31, 59, 0.65)",
               boxShadow:
                 theme.palette.mode === "light"
-                  ? `0 0 1px rgba(85, 166, 246, 0.1), 1px 1.5px 2px -1px rgba(85, 166, 246, 0.15), 4px 4px 12px -2.5px rgba(85, 166, 246, 0.15)`
-                  : "0 0 1px rgba(2, 31, 59, 0.7), 1px 1.5px 2px -1px rgba(2, 31, 59, 0.65), 4px 4px 12px -2.5px rgba(2, 31, 59, 0.65)",
+                  ? `0 0 12px 8px ${alpha("#9CCCFC", 0.2)}`
+                  : `0 0 24px 12px ${alpha("#033363", 0.2)}`,
             })}
           >
             <Box

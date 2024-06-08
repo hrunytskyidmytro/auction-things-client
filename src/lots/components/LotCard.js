@@ -43,7 +43,7 @@ const LotCard = ({ lot }) => {
   ] = useDeleteFromWatchlistMutation();
 
   const { data: checkWatchlistExist, refetch: refetchCheckWatchlistExist } =
-    useCheckWatchlistExistQuery(lot.id);
+    useCheckWatchlistExistQuery(lot?.id);
 
   const [openErrorAlert, setOpenErrorAlert] = useState(false);
 
@@ -93,9 +93,9 @@ const LotCard = ({ lot }) => {
           subheader={format(new Date(lot?.createdAt), "dd.MM.yyyy")}
         />
         <CardContent sx={{ marginTop: "auto", padding: 0 }}>
-          {lot.imageUrls && lot.imageUrls.length > 0 ? (
+          {lot?.imageUrls && lot?.imageUrls.length > 0 ? (
             <Carousel showThumbs={false} showStatus={false} infiniteLoop>
-              {lot.imageUrls.map((url, index) => (
+              {lot?.imageUrls.map((url, index) => (
                 <div key={index}>
                   <StyledImage
                     src={`http://localhost:5001/${url}`}

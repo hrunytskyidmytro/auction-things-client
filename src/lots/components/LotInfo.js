@@ -53,13 +53,13 @@ const LotInfo = ({
             sx={{ bgcolor: red[500] }}
             aria-label="lot"
             {...stringAvatar(
-              `${lot.creator?.firstName} ${lot.creator?.lastName}`
+              `${lot?.creator?.firstName} ${lot?.creator?.lastName}`
             )}
           />
         }
-        title={`${lot.creator?.firstName} ${lot.creator?.lastName}`}
+        title={`${lot?.creator?.firstName} ${lot?.creator?.lastName}`}
         subheader={
-          lot.createdAt && format(new Date(lot.createdAt), "dd.MM.yyyy")
+          lot?.createdAt && format(new Date(lot.createdAt), "dd.MM.yyyy")
         }
       />
       <CardContent>
@@ -73,12 +73,12 @@ const LotInfo = ({
           }}
           gutterBottom
         >
-          {lot.title}{" "}
+          {lot?.title}{" "}
           <Chip
             variant="filled"
             color="info"
             size="medium"
-            label={`#${lot.id}`}
+            label={`#${lot?.id}`}
           />
         </Typography>
         <Paper elevation={2} sx={{ p: 2, mb: 2, borderRadius: 2 }}>
@@ -96,10 +96,10 @@ const LotInfo = ({
             sx={{ color: grey[800], fontWeight: "bold" }}
             gutterBottom
           >
-            {lot.currentPrice} грн.
+            {lot?.currentPrice} грн.
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Крок ставки: {lot.bidIncrement} грн.
+            Крок ставки: {lot?.bidIncrement} грн.
             <Tooltip
               title="Крок ставки - це мінімальна різниця між двома сусідніми ставками. Якщо буде введено ціну, не врахувавши крок ставки, то ставка не пройде."
               arrow
@@ -108,7 +108,7 @@ const LotInfo = ({
             </Tooltip>
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-            Резервна ціна: {lot.reservePrice} грн.
+            Резервна ціна: {lot?.reservePrice} грн.
             <Tooltip
               title="Резервна ціна - це мінімальна ціна, за якої продавець погоджується продати лот. Поточна ціна повинна перевищувати резервну ціну. Якщо ціну не перевищено ставками, то лот не буде продано."
               arrow
@@ -133,7 +133,7 @@ const LotInfo = ({
                 justifyContent: "center",
               }}
             >
-              Кількість зроблених ставок: {lot.bidCount}
+              Кількість зроблених ставок: {lot?.bidCount}
             </Typography>
             {lot && lot.bidCount > 0 && (
               <Button variant="text" onClick={handleToggleBids}>
@@ -157,7 +157,7 @@ const LotInfo = ({
             sx={{ color: grey[800], fontWeight: "bold" }}
             gutterBottom
           >
-            {lot.buyNowPrice} грн.
+            {lot?.buyNowPrice} грн.
           </Typography>
         </Paper>
         <Paper elevation={2} sx={{ p: 2, mt: 2, borderRadius: 2 }}>
@@ -192,7 +192,7 @@ const LotInfo = ({
                 loading={isBuyLotNow}
                 onClick={handleBuyNowClick}
               >
-                Купити зараз за {lot.buyNowPrice} грн.
+                Купити зараз за {lot?.buyNowPrice} грн.
               </LoadingButton>
               <LoadingButton
                 variant="outlined"

@@ -9,7 +9,7 @@ const LotDescription = ({ lot }) => {
           Опис
         </Typography>
         <Typography variant="body1" paragraph>
-          {lot.description}
+          {lot?.description}
         </Typography>
       </Box>
     </>

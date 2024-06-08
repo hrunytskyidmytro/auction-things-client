@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import {
   useGetLotByIdQuery,
@@ -27,10 +27,9 @@ import LotDescription from "../components/LotDescription";
 import BidDialog from "../components/BidDialog";
 import BidHistoryDialog from "../components/BidHistoryDialog";
 
-import { useCreateCheckoutSessionMutation } from "../../api/paymentApi";
-
 const LotDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const {
     data: lot,
     isFetching: isFetchingLot,
@@ -48,9 +47,6 @@ const LotDetail = () => {
   const [buyLotNow, { isLoading: isBuyLotNow }] = useBuyLotNowMutation();
   const { data: checkWatchlistExist, refetch: refetchWatchlist } =
     useCheckWatchlistExistQuery(id);
-
-  const [createCheckoutSession, { isLoading, error }] =
-    useCreateCheckoutSessionMutation();
 
   const { user } = useAuth();
 
@@ -118,6 +114,12 @@ const LotDetail = () => {
 
     return () => clearInterval(newIntervalId);
   }, [lot]);
+
+  useEffect(() => {
+    if (errorLot) {
+      navigate("/404");
+    }
+  }, [errorLot, navigate]);
 
   if (isFetchingLot) {
     return (
@@ -238,7 +240,7 @@ const LotDetail = () => {
           </Box>
         </Grid>
         <Grid item xs={12} md={6}>
-          <LotImages images={lot.imageUrls} />
+          <LotImages images={lot?.imageUrls} />
         </Grid>
         <Grid item xs={12} md={6}>
           <LotInfo

@@ -23,14 +23,14 @@ const GoogleAuthCallback = () => {
       getCurrentUser({ token })
         .unwrap()
         .then((res) => dispatch(setUser(res)))
-        .catch((error) => console.log(error))
+        .catch((error) => console.log(error));
       navigate("/");
     } else {
       navigate("/login");
     }
   }, [navigate, location]);
 
-  return <div>Redirecting...</div>;
+  return <div>Перенаправлення...</div>;
 };
 
 export default GoogleAuthCallback;

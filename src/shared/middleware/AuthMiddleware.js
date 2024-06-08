@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setToken, setUser } from "../../store/authSlice";
 import { useLazyGetCurrentUserInfoQuery } from "../../api/userApi";
-
-import { CircularProgress, Box } from "@mui/material";
+import LoadingSpinner from "../components/UIElements/LoadingSpinner";
 
 export const AuthMiddleware = ({ children }) => {
   const dispatch = useDispatch();
@@ -26,18 +25,7 @@ export const AuthMiddleware = ({ children }) => {
   }, []);
 
   if (isLoading) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
-        <CircularProgress size={50} thickness={3.6} />
-      </Box>
-    );
+    return <LoadingSpinner size={50} />;
   }
 
   return children;
