@@ -10,6 +10,7 @@ export const StyledCard = styled(Card)({
   width: "100%",
   position: "relative",
   borderRadius: 30,
+  boxShadow: "0px 10px 20px rgba(0, 0, 0, 0.2)",
 });
 
 export const StyledImage = styled("img")({
@@ -23,4 +24,17 @@ export const StyledCardActions = styled(CardActions)({
   justifyContent: "space-between",
   alignItems: "center",
   marginTop: "auto",
+});
+
+export const StyledFilterCard = styled(Card)({
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "space-between",
+  flexGrow: 1,
+  p: 1,
+  height: "100vh",
+  width: "100%",
+  position: "relative",
+  borderRadius: 30,
+  boxShadow: "0px 10px 20px rgba(0, 0, 0, 0.2)",
 });
