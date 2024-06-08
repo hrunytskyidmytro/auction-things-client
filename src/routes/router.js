@@ -34,6 +34,7 @@ import LotsPageByCategory from "../lots/pages/LotsPageByCategory";
 
 import LotsForBuyers from "../lots/pages/Lots";
 import LotDetail from "../lots/pages/LotDetail";
+import UserLots from "../user/pages/UserLots";
 
 import SellerWelcomePage from "../user/pages/SellerWelcomePage";
 
@@ -46,6 +47,13 @@ import WithdrawFundsForm from "../payments/pages/WithdrawFundsPage";
 import BalanceActionPage from "../payments/pages/BalanceActionPage";
 import SuccessPage from "../payments/pages/SuccessPage";
 
+import SellOnBidAndWin from "../home/pages/SellOnBid&Win";
+import BuyingTips from "../home/pages/BuyingTips";
+import AboutUs from "../home/pages/AboutUs";
+import Faq from "../home/pages/Faq";
+import Privacy from "../home/pages/Privacy";
+import Conditions from "../home/pages/Conditions";
+
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -56,11 +64,21 @@ export const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        element: <CategoriesList />,
+        path: "categories",
+        children: [
+          {
+            index: true,
+            element: <CategoriesList />,
+          },
+          {
+            path: ":id",
+            element: <LotsPageByCategory />,
+          },
+        ],
       },
       {
-        path: "/categories/:id",
-        element: <LotsPageByCategory />,
+        path: "/seller/:id",
+        element: <UserLots />,
       },
       {
         path: "welcome-seller",
@@ -78,6 +96,22 @@ export const router = createBrowserRouter([
             element: <LotDetail />,
           },
         ],
+      },
+      {
+        path: "sell-on-bid&win",
+        element: <SellOnBidAndWin />,
+      },
+      {
+        path: "buying-tips",
+        element: <BuyingTips />,
+      },
+      {
+        path: "about-us",
+        element: <AboutUs />,
+      },
+      {
+        path: "faq",
+        element: <Faq />,
       },
       {
         element: <PrivateOutlet />,
@@ -175,6 +209,14 @@ export const router = createBrowserRouter([
             element: <ResetPassword />,
           },
         ],
+      },
+      {
+        path: "privacy",
+        element: <Privacy />,
+      },
+      {
+        path: "conditions",
+        element: <Conditions />,
       },
     ],
   },

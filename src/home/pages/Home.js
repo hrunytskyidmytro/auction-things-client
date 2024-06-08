@@ -18,13 +18,6 @@ const Home = () => {
       </Typography>
       <CategoriesList />
       <Typography
-        variant="h4"
-        fontWeight={600}
-        sx={{ color: "#01579b", mt: 10, textAlign: "center" }}
-      >
-        About author
-      </Typography>
-      <Typography
         variant="body2"
         gutterBottom
         sx={{
