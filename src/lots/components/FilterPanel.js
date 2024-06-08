@@ -125,37 +125,42 @@ const FilterPanel = ({
             </RadioGroup>
           </FormControl>
           <Divider sx={{ mb: 2 }} />
-          <FormGroup sx={{ mb: 2 }}>
-            <Typography id="category-checkbox-group" gutterBottom>
-              Категорії
-              <Tooltip
-                title="Оберіть категорії лотів, які Вас цікавлять. Вони дають можливість знайти ту категорію товару, яка цікавить."
-                arrow
-              >
-                <HelpOutlineIcon sx={{ ml: 1, fontSize: "1rem" }} />
-              </Tooltip>
-            </Typography>
-            {categoriesData &&
-              categoriesData.map((category) => (
-                <FormControlLabel
-                  key={category.id}
-                  control={
-                    <Checkbox
-                      value={category.id}
-                      checked={selectedCategories.includes(
-                        category.id.toString()
-                      )}
-                      onChange={handleCategoryChange}
-                    />
-                  }
-                  label={category.name}
-                />
-              ))}
-          </FormGroup>
-          <Divider sx={{ mb: 2 }} />
+          {categoriesData && categoriesData !== 0 ? (
+            <>
+              <FormGroup sx={{ mb: 2 }}>
+                <Typography id="category-checkbox-group" gutterBottom>
+                  Категорії
+                  <Tooltip
+                    title="Оберіть категорії лотів, які Вас цікавлять. Вони дають можливість знайти ту категорію товару, яка цікавить."
+                    arrow
+                  >
+                    <HelpOutlineIcon sx={{ ml: 1, fontSize: "1rem" }} />
+                  </Tooltip>
+                </Typography>
+                {categoriesData.map((category) => (
+                  <FormControlLabel
+                    key={category.id}
+                    control={
+                      <Checkbox
+                        value={category.id}
+                        checked={selectedCategories.includes(
+                          category.id.toString()
+                        )}
+                        onChange={handleCategoryChange}
+                      />
+                    }
+                    label={category.name}
+                  />
+                ))}
+              </FormGroup>
+              <Divider sx={{ mb: 2 }} />
+            </>
+          ) : (
+            ""
+          )}
           <FormControl component="fieldset" fullWidth sx={{ mb: 2 }}>
             <Typography id="status-checkbox-group" gutterBottom>
-              Статус лотів
+              Статуси лотів
               <Tooltip
                 title="Оберіть статуси лотів, які бажаєте переглянути. Їх всього є два типи - це відкриті та закриті."
                 arrow
