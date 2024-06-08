@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Grid, Box, Container } from "@mui/material";
+import { useGetAllLotsQuery } from "../../api/lotApi";
+import { useGetAllCategoriesQuery } from "../../api/categoryApi";
+
 import Breadcrumbs from "../../shared/components/UIElements/Breadcrumbs";
 import MessageSnackbar from "../../shared/components/UIElements/MessageSnackbar";
 import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
-import { useGetAllLotsQuery } from "../../api/lotApi";
-import { useGetAllCategoriesQuery } from "../../api/categoryApi";
 
 import FilterPanel from "../components/FilterPanel";
 import LotList from "../components/LotList";
@@ -18,10 +19,8 @@ const LotsForBuyers = () => {
   const [currentPriceRange, setCurrentPriceRange] = useState([0, 1000]);
   const [buyNowPriceRange, setBuyNowPriceRange] = useState([0, 1000]);
   const [dateOption, setDateOption] = useState("all");
-
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedStatuses, setSelectedStatuses] = useState([]);
-
   const [search, setSearch] = useState("");
   const [openErrorAlert, setOpenErrorAlert] = useState(false);
 

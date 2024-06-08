@@ -47,7 +47,14 @@ const UserProfile = () => {
         mt: 8,
       }}
     >
-      <Card sx={{ maxWidth: 600, width: "100%", p: 2 }}>
+      <Card
+        sx={{
+          maxWidth: 600,
+          width: "100%",
+          p: 2,
+          boxShadow: "0px 10px 20px rgba(0, 0, 0, 0.2)",
+        }}
+      >
         <CardContent>
           <Box
             sx={{
