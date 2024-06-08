@@ -1,73 +1,107 @@
 import React, { useState, useEffect } from "react";
-import {
-  CardHeader,
-  CardContent,
-  Grid,
-  Skeleton,
-  Box,
-  Container,
-  Button,
-  Pagination,
-} from "@mui/material";
-import { StyledCard, StyledCardActions } from "../styles/cardStyles";
+import { Grid, Box, Container } from "@mui/material";
 import Breadcrumbs from "../../shared/components/UIElements/Breadcrumbs";
 import MessageSnackbar from "../../shared/components/UIElements/MessageSnackbar";
-
-import LotCard from "../components/LotCard";
-
-import { useAuth } from "../../shared/hooks/useAuth";
+import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
 import { useGetAllLotsQuery } from "../../api/lotApi";
+import { useGetAllCategoriesQuery } from "../../api/categoryApi";
+
+import FilterPanel from "../components/FilterPanel";
+import LotList from "../components/LotList";
+import PaginationSection from "../../shared/components/UIElements/PaginationSection";
+import SearchAndSortPanel from "../components/SearchAndSortPanel";
+import LotsSkeleton from "../components/LotsSkeleton";
 
 const LotsForBuyers = () => {
-  const { user } = useAuth();
+  const [page, setPage] = useState(1);
+  const [sortBy, setSortBy] = useState("");
+  const [currentPriceRange, setCurrentPriceRange] = useState([0, 1000]);
+  const [buyNowPriceRange, setBuyNowPriceRange] = useState([0, 1000]);
+  const [dateOption, setDateOption] = useState("all");
 
-  // const [sortBy, setSortBy] = useState("");
-  // const [sortOrder, setSortOrder] = useState("");
-  // const [page, setPage] = useState(1);
-  // const [limit, setLimit] = useState(10);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [selectedStatuses, setSelectedStatuses] = useState([]);
 
-  const { data: lots, isLoading, error } = useGetAllLotsQuery();
-
+  const [search, setSearch] = useState("");
   const [openErrorAlert, setOpenErrorAlert] = useState(false);
 
+  const {
+    data: { lots: lotsData, totalPages } = {},
+    isLoading,
+    error: lotsError,
+  } = useGetAllLotsQuery({
+    page,
+    sortBy,
+    currentPriceFrom: currentPriceRange[0],
+    currentPriceTo: currentPriceRange[1],
+    buyNowPriceFrom: buyNowPriceRange[0],
+    buyNowPriceTo: buyNowPriceRange[1],
+    dateOption,
+    categoryId: selectedCategories,
+    status: selectedStatuses,
+    search,
+  });
+
+  const {
+    data: categoriesData,
+    isLoading: isCategoriesLoading,
+    error: categoriesError,
+  } = useGetAllCategoriesQuery();
+
   useEffect(() => {
-    if (error) {
+    if (lotsError || categoriesError) {
       setOpenErrorAlert(true);
     }
-  }, [error]);
+  }, [lotsError, categoriesError]);
+
+  const handleChangePage = (event, value) => {
+    setPage(value);
+  };
+
+  const handleChangeSort = (event) => {
+    setSortBy(event.target.value);
+  };
+
+  const handleChangeCurrentPriceRange = (event, newValue) => {
+    setCurrentPriceRange(newValue);
+  };
+
+  const handleChangeBuyNowPriceRange = (event, newValue) => {
+    setBuyNowPriceRange(newValue);
+  };
+
+  const handleChangeDateOption = (event) => {
+    setDateOption(event.target.value);
+  };
+
+  const handleSearch = (event) => {
+    setSearch(event.target.value);
+  };
+
+  const handleCategoryChange = (event) => {
+    const category = event.target.value;
+    setSelectedCategories((prevCategories) =>
+      prevCategories.includes(category)
+        ? prevCategories.filter((c) => c !== category)
+        : [...prevCategories, category]
+    );
+  };
+
+  const handleStatusChange = (event) => {
+    const status = event.target.value;
+    setSelectedStatuses((prevStatuses) =>
+      prevStatuses.includes(status)
+        ? prevStatuses.filter((s) => s !== status)
+        : [...prevStatuses, status]
+    );
+  };
 
   if (isLoading) {
-    return (
-      <Grid container spacing={3} sx={{ mt: 15, justifyContent: "center" }}>
-        {Array.from({ length: lots?.length || 4 }).map((_, index) => (
-          <Grid item key={index}>
-            <StyledCard>
-              <CardHeader
-                avatar={<Skeleton variant="circular" width={40} height={40} />}
-                action={
-                  <Skeleton variant="rectangular" width={24} height={24} />
-                }
-                title={<Skeleton variant="text" width={150} />}
-                subheader={<Skeleton variant="text" width={100} />}
-              />
-              <Skeleton variant="rectangular" width={280} height={250} />
-              <CardContent sx={{ marginTop: "auto", padding: 0 }}>
-                <Skeleton variant="text" animation="wave" width={280} />
-              </CardContent>
-              <CardContent sx={{ marginTop: "auto" }}>
-                <Skeleton variant="text" animation="wave" width={280} />
-              </CardContent>
-              <StyledCardActions disableSpacing>
-                <Skeleton variant="text" animation="wave" width={150} />
-              </StyledCardActions>
-              <CardContent sx={{ marginTop: "auto" }}>
-                <Skeleton variant="text" animation="wave" width={280} />
-              </CardContent>
-            </StyledCard>
-          </Grid>
-        ))}
-      </Grid>
-    );
+    return <LotsSkeleton />;
+  }
+
+  if (isCategoriesLoading) {
+    return <LoadingSpinner size={30} />;
   }
 
   return (
@@ -97,43 +131,37 @@ const LotsForBuyers = () => {
             </Box>
           </Grid>
           <Grid item xs={12}>
-            <Box
-              sx={{
-                mt: 1,
-                display: "flex",
-                justifyContent: "flex-end",
-                alignItems: "center",
-                width: "100%",
-              }}
-            >
-              <Button>Сортування</Button>
-            </Box>
+            <SearchAndSortPanel
+              search={search}
+              handleSearch={handleSearch}
+              sortBy={sortBy}
+              handleChangeSort={handleChangeSort}
+            />
           </Grid>
-          {lots &&
-            lots.map((lot) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={lot.id}>
-                <LotCard lot={lot} />
-              </Grid>
-            ))}
+          <Grid item xs={12} md={3}>
+            <FilterPanel
+              currentPriceRange={currentPriceRange}
+              handleChangeCurrentPriceRange={handleChangeCurrentPriceRange}
+              buyNowPriceRange={buyNowPriceRange}
+              handleChangeBuyNowPriceRange={handleChangeBuyNowPriceRange}
+              dateOption={dateOption}
+              handleChangeDateOption={handleChangeDateOption}
+              categoriesData={categoriesData}
+              selectedCategories={selectedCategories}
+              handleCategoryChange={handleCategoryChange}
+              selectedStatuses={selectedStatuses}
+              handleStatusChange={handleStatusChange}
+            />
+          </Grid>
+          <Grid item xs={12} md={9}>
+            <LotList lotsData={lotsData} />
+          </Grid>
           <Grid item xs={12}>
-            <Box
-              sx={{
-                mt: 5,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                width: "100%",
-              }}
-            >
-              <Pagination
-                // count={Math.ceil(total / limit)}
-                count={10}
-                // page={page}
-                // onChange={handlePageChange}
-                variant="outlined"
-                color="primary"
-              />
-            </Box>
+            <PaginationSection
+              totalPages={totalPages}
+              page={page}
+              handleChangePage={handleChangePage}
+            />
           </Grid>
         </Grid>
       </Box>
@@ -142,7 +170,8 @@ const LotsForBuyers = () => {
         onClose={() => setOpenErrorAlert(false)}
         severity="error"
         message={
-          error?.data?.message ||
+          lotsError?.data?.message ||
+          categoriesError?.data?.message ||
           "Виникла помилка. Будь ласка, спробуйте ще раз."
         }
       />
