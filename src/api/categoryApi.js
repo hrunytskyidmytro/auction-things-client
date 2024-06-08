@@ -35,10 +35,24 @@ export const categoryApi = api.injectEndpoints({
       }),
     }),
     getLotsByCategory: builder.query({
-      query: (categoryId) => ({
-        url: `/categories/${categoryId}/lots`,
-        method: "GET",
-      }),
+      query: ({
+        categoryId,
+        page,
+        sortBy,
+        currentPriceFrom,
+        currentPriceTo,
+        buyNowPriceFrom,
+        buyNowPriceTo,
+        dateOption,
+        status,
+        search,
+      }) => {
+        const statuses = Array.isArray(status) ? status.join(",") : status;
+        return {
+          url: `/categories/${categoryId}/lots/?page=${page}&sortBy=${sortBy}&status=${statuses}&currentPriceFrom=${currentPriceFrom}&currentPriceTo=${currentPriceTo}&buyNowPriceFrom=${buyNowPriceFrom}&buyNowPriceTo=${buyNowPriceTo}&dateOption=${dateOption}&search=${search}`,
+          method: "GET",
+        };
+      },
     }),
   }),
 });

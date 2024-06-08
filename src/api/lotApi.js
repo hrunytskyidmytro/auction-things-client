@@ -65,6 +65,37 @@ export const lotApi = api.injectEndpoints({
         body: data,
       }),
     }),
+    getUserLots: builder.query({
+      query: ({
+        userId,
+        page,
+        sortBy,
+        categoryId,
+        status,
+        currentPriceFrom,
+        currentPriceTo,
+        buyNowPriceFrom,
+        buyNowPriceTo,
+        dateOption,
+        search,
+      }) => {
+        const categoryIds = Array.isArray(categoryId)
+          ? categoryId.join(",")
+          : categoryId;
+        const statuses = Array.isArray(status) ? status.join(",") : status;
+
+        return {
+          url: `/lots/seller/${userId}/?page=${page}&sortBy=${sortBy}&categoryId=${categoryIds}&status=${statuses}&currentPriceFrom=${currentPriceFrom}&currentPriceTo=${currentPriceTo}&buyNowPriceFrom=${buyNowPriceFrom}&buyNowPriceTo=${buyNowPriceTo}&dateOption=${dateOption}&search=${search}`,
+          method: "GET",
+        };
+      },
+    }),
+    getLatestOpenLotsBySeller: builder.query({
+      query: (userId) => ({
+        url: `/lots/seller/${userId}/latest-open-lots`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -76,4 +107,6 @@ export const {
   useGetAllLotsQuery,
   useGetLotBidsQuery,
   useBuyLotNowMutation,
+  useGetUserLotsQuery,
+  useGetLatestOpenLotsBySellerQuery,
 } = lotApi;
