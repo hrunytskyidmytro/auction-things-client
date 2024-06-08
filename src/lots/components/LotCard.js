@@ -14,6 +14,7 @@ import { red, green, grey, yellow } from "@mui/material/colors";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import MessageSnackbar from "../../shared/components/UIElements/MessageSnackbar";
+import EditTwoToneIcon from "@mui/icons-material/EditTwoTone";
 import {
   StyledCard,
   StyledImage,
@@ -33,7 +34,7 @@ import {
   useDeleteFromWatchlistMutation,
 } from "../../api/watchlistApi";
 
-const LotCard = ({ lot }) => {
+const LotCard = ({ lot, userSeller }) => {
   const { user } = useAuth();
   const [addToWatchlist, { error: errorAdd, isLoading: isLoadingAdd }] =
     useAddToWatchlistMutation();
@@ -91,6 +92,13 @@ const LotCard = ({ lot }) => {
             )
           }
           subheader={format(new Date(lot?.createdAt), "dd.MM.yyyy")}
+          action={
+            userSeller && (
+              <IconButton aria-label="settings">
+                <EditTwoToneIcon />
+              </IconButton>
+            )
+          }
         />
         <CardContent sx={{ marginTop: "auto", padding: 0 }}>
           {lot?.imageUrls && lot?.imageUrls.length > 0 ? (

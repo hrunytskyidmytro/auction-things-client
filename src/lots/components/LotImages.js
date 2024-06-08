@@ -6,7 +6,7 @@ import Fancybox from "../components/FancyBox";
 
 const LotImages = ({ images }) => {
   return (
-    <Paper elevation={3} sx={{ mb: 1, borderRadius: 2 }}>
+    <Paper elevation={5} sx={{ mb: 1, borderRadius: 4 }}>
       {images && images.length > 0 && (
         <Fancybox>
           <Carousel showStatus={false} autoPlay interval={3000} infiniteLoop>

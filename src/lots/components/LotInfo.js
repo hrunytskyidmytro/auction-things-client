@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   CardHeader,
@@ -45,19 +46,36 @@ const LotInfo = ({
   handleAddToWatchlist,
   isBuyLotNow,
 }) => {
+  const navigate = useNavigate();
+
+  const handleUserSelect = (userId) => {
+    navigate(`/seller/${userId}`);
+  };
+
   return (
-    <Card sx={{ borderRadius: 2 }}>
+    <Card
+      sx={{ borderRadius: 4, boxShadow: "0px 10px 20px rgba(0, 0, 0, 0.2)" }}
+    >
       <CardHeader
         avatar={
           <Avatar
-            sx={{ bgcolor: red[500] }}
+            sx={{ bgcolor: red[500], cursor: "pointer" }}
             aria-label="lot"
             {...stringAvatar(
               `${lot?.creator?.firstName} ${lot?.creator?.lastName}`
             )}
+            onClick={() => handleUserSelect(lot?.creator?.id)}
           />
         }
-        title={`${lot?.creator?.firstName} ${lot?.creator?.lastName}`}
+        title={
+          <Typography
+            variant="body1"
+            sx={{ cursor: "pointer", width: "180px" }}
+            onClick={() => handleUserSelect(lot?.creator?.id)}
+          >
+            {`${lot?.creator?.firstName} ${lot?.creator?.lastName}`}
+          </Typography>
+        }
         subheader={
           lot?.createdAt && format(new Date(lot.createdAt), "dd.MM.yyyy")
         }
@@ -81,7 +99,14 @@ const LotInfo = ({
             label={`#${lot?.id}`}
           />
         </Typography>
-        <Paper elevation={2} sx={{ p: 2, mb: 2, borderRadius: 2 }}>
+        <Paper
+          elevation={5}
+          sx={{
+            p: 2,
+            mb: 2,
+            borderRadius: 4,
+          }}
+        >
           <Typography
             variant="h6"
             color="text.primary"
@@ -93,7 +118,8 @@ const LotInfo = ({
           </Typography>
           <Typography
             variant="h5"
-            sx={{ color: grey[800], fontWeight: "bold" }}
+            sx={{ color: grey[800] }}
+            fontWeight={600}
             gutterBottom
           >
             {lot?.currentPrice} грн.
@@ -142,7 +168,7 @@ const LotInfo = ({
             )}
           </Box>
         </Paper>
-        <Paper elevation={2} sx={{ p: 2, mb: 2, borderRadius: 2 }}>
+        <Paper elevation={5} sx={{ p: 2, mb: 2, borderRadius: 4 }}>
           <Typography
             variant="h6"
             color="text.primary"
@@ -154,13 +180,14 @@ const LotInfo = ({
           </Typography>
           <Typography
             variant="h5"
-            sx={{ color: grey[800], fontWeight: "bold" }}
+            sx={{ color: grey[800] }}
+            fontWeight={600}
             gutterBottom
           >
             {lot?.buyNowPrice} грн.
           </Typography>
         </Paper>
-        <Paper elevation={2} sx={{ p: 2, mt: 2, borderRadius: 2 }}>
+        <Paper elevation={5} sx={{ p: 2, mt: 2, borderRadius: 4 }}>
           <Typography
             variant="h6"
             color="text.primary"
