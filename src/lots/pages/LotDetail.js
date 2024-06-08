@@ -5,6 +5,7 @@ import {
   useGetLotByIdQuery,
   useGetLotBidsQuery,
   useBuyLotNowMutation,
+  useGetLatestOpenLotsBySellerQuery,
 } from "../../api/lotApi";
 import { useCreateBidMutation } from "../../api/bidApi";
 import {
@@ -14,7 +15,7 @@ import {
 
 import { useAuth } from "../../shared/hooks/useAuth";
 
-import { Grid, Container, Box, Skeleton } from "@mui/material";
+import { Grid, Container, Box, Skeleton, Typography } from "@mui/material";
 import { red, grey, orange } from "@mui/material/colors";
 
 import Breadcrumbs from "../../shared/components/UIElements/Breadcrumbs";
@@ -26,6 +27,8 @@ import LotDescription from "../components/LotDescription";
 
 import BidDialog from "../components/BidDialog";
 import BidHistoryDialog from "../components/BidHistoryDialog";
+
+import LotListSeller from "../components/LotListSeller";
 
 const LotDetail = () => {
   const { id } = useParams();
@@ -47,6 +50,8 @@ const LotDetail = () => {
   const [buyLotNow, { isLoading: isBuyLotNow }] = useBuyLotNowMutation();
   const { data: checkWatchlistExist, refetch: refetchWatchlist } =
     useCheckWatchlistExistQuery(id);
+
+  const { data: latestLots } = useGetLatestOpenLotsBySellerQuery(lot?.userId);
 
   const { user } = useAuth();
 
@@ -83,8 +88,8 @@ const LotDetail = () => {
   useEffect(() => {
     let newIntervalId;
 
-    if (lot && lot.endDate) {
-      const newIntervalId = setInterval(() => {
+    const updateCountdown = () => {
+      if (lot && lot.endDate) {
         const endDate = new Date(lot.endDate);
         const now = new Date();
         const difference = endDate - now;
@@ -109,7 +114,12 @@ const LotDetail = () => {
             setTimeLeftColor(red[500]);
           }
         }
-      }, 1000);
+      }
+    };
+
+    if (lot && lot.endDate) {
+      updateCountdown();
+      newIntervalId = setInterval(updateCountdown, 1000);
     }
 
     return () => clearInterval(newIntervalId);
@@ -199,7 +209,6 @@ const LotDetail = () => {
       await addToWatchlist({ userId: user.id, lotId: id }).unwrap();
       refetchWatchlist();
     } catch (error) {
-      console.log(error);
       setOpenErrorAlert(true);
       setErrorMessage(
         error?.data?.message || "Виникла помилка. Будь ласка, спробуйте ще раз."
@@ -259,6 +268,20 @@ const LotDetail = () => {
         </Grid>
         <Grid item xs={12}>
           <LotDescription lot={lot} />
+        </Grid>
+        <Grid item xs={12}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "center",
+            }}
+          >
+            <Typography variant="h4" sx={{ mb: 3 }}>
+              Інші пропозиції продавця
+            </Typography>
+          </Box>
+          <LotListSeller lotsData={latestLots} />
         </Grid>
       </Grid>
       <BidHistoryDialog
