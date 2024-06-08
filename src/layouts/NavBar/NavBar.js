@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-
 import {
   Box,
   AppBar,
@@ -11,7 +10,6 @@ import {
   Typography,
   MenuItem,
   Drawer,
-  Link,
   Avatar,
   Tooltip,
   Menu,
@@ -29,6 +27,7 @@ import Logout from "@mui/icons-material/Logout";
 import AdminPanelSettingsTwoToneIcon from "@mui/icons-material/AdminPanelSettingsTwoTone";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
+import GavelTwoToneIcon from "@mui/icons-material/GavelTwoTone";
 
 import ToggleColorMode from "../../shared/components/ToggleColorMode";
 import MessageSnackbar from "../../shared/components/UIElements/MessageSnackbar";
@@ -131,10 +130,6 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
               maxHeight: 40,
               border: "1px solid",
               borderColor: "divider",
-              // boxShadow:
-              //   theme.palette.mode === "light"
-              //     ? `0 0 1px rgba(85, 166, 246, 0.1), 1px 1.5px 2px -1px rgba(85, 166, 246, 0.15), 4px 4px 12px -2.5px rgba(85, 166, 246, 0.15)`
-              //     : "0 0 1px rgba(2, 31, 59, 0.7), 1px 1.5px 2px -1px rgba(2, 31, 59, 0.65), 4px 4px 12px -2.5px rgba(2, 31, 59, 0.65)",
               boxShadow:
                 theme.palette.mode === "light"
                   ? `0 0 12px 8px ${alpha("#9CCCFC", 0.2)}`
@@ -150,53 +145,50 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
                 px: 0,
               }}
             >
-              <Link to="/" component={RouterLink} underline="hover">
-                <Typography
-                  variant="h6"
-                  fontWeight={500}
-                  sx={{ color: "#01579b" }}
-                >
-                  <img src="/logo.png" style={logoStyle} alt="Логотип" />
-                </Typography>
-              </Link>
+              <Typography
+                variant="h6"
+                fontWeight={500}
+                sx={{ color: "#01579b" }}
+                onClick={() => navigate("/")}
+              >
+                <img src="/logo.png" style={logoStyle} alt="Логотип" />
+              </Typography>
               <Box sx={{ display: { xs: "none", md: "flex" } }}>
                 <MenuItem
-                  // onClick={() => scrollToSection("features")}
                   sx={{ py: "6px", px: "12px" }}
+                  onClick={() => navigate("/lots")}
                 >
-                  <Link to="/lots" component={RouterLink} underline="hover">
-                    <Typography variant="body2" color="text.primary">
-                      Лоти
-                    </Typography>
-                  </Link>
+                  <Typography variant="body2" color="text.primary">
+                    Лоти
+                  </Typography>
                 </MenuItem>
                 <MenuItem
-                  // onClick={() => scrollToSection("testimonials")}
                   sx={{ py: "6px", px: "12px" }}
+                  onClick={() => navigate("sell-on-bid&win")}
                 >
                   <Typography variant="body2" color="text.primary">
                     Продати на Bid&Win
                   </Typography>
                 </MenuItem>
                 <MenuItem
-                  // onClick={() => scrollToSection("highlights")}
                   sx={{ py: "6px", px: "12px" }}
+                  onClick={() => navigate("buying-tips")}
                 >
                   <Typography variant="body2" color="text.primary">
                     Поради щодо купівлі
                   </Typography>
                 </MenuItem>
                 <MenuItem
-                  // onClick={() => scrollToSection("pricing")}
                   sx={{ py: "6px", px: "12px" }}
+                  onClick={() => navigate("about-us")}
                 >
                   <Typography variant="body2" color="text.primary">
                     Про нас
                   </Typography>
                 </MenuItem>
                 <MenuItem
-                  // onClick={() => scrollToSection("faq")}
                   sx={{ py: "6px", px: "12px" }}
+                  onClick={() => navigate("Faq")}
                 >
                   <Typography variant="body2" color="text.primary">
                     FAQ
@@ -320,10 +312,12 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
                       )}
                       {isSeller && (
                         <MenuItem
-                          onClick={handleCloseMenuAndDrawer("/seller/lots")}
+                          onClick={handleCloseMenuAndDrawer(
+                            `/seller/${user.id}`
+                          )}
                         >
                           <ListItemIcon>
-                            <Settings fontSize="small" />
+                            <GavelTwoToneIcon fontSize="small" />
                           </ListItemIcon>
                           Мої лоти
                         </MenuItem>

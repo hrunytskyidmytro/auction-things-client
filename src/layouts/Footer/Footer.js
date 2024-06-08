@@ -1,26 +1,20 @@
 import React from "react";
-
-import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
-import IconButton from "@mui/material/IconButton";
-import Link from "@mui/material/Link";
-import Stack from "@mui/material/Stack";
-import Typography from "@mui/material/Typography";
-
+import {
+  Box,
+  Container,
+  IconButton,
+  Link,
+  Stack,
+  Typography,
+} from "@mui/material";
 import FacebookIcon from "@mui/icons-material/GitHub";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import TwitterIcon from "@mui/icons-material/X";
-
-const logoStyle = {
-  width: "140px",
-  height: "auto",
-};
 
 const Copyright = () => {
   return (
-    <Typography variant="body2" color="text.secondary" mt={1}>
+    <Typography variant="body2" color="text.secondary">
       {"Copyright © "}
-      <Link href="#">Дмитро Груницький&nbsp;</Link>
+      <Link href="/">Дмитро Груницький&nbsp;</Link>
       {new Date().getFullYear()}
     </Typography>
   );
@@ -50,50 +44,19 @@ const Footer = () => {
           sx={{
             display: "flex",
             flexDirection: "column",
+            justifyContent: "center",
             gap: 4,
-            minWidth: { xs: "100%", sm: "60%" },
+            minWidth: { xs: "100%", sm: "30%" },
           }}
         >
-          <Box sx={{ width: { xs: "100%", sm: "60%" } }}>
-            <Box sx={{ mt: "80px", ml: "-15px" }}>
-              <Link href="/main" underline="hover">
-                <Typography
-                  variant="h6"
-                  fontWeight={600}
-                  sx={{ color: "#01579b" }}
-                >
-                  <img src="/logo.png" style={logoStyle} alt="Логотип" />
-                </Typography>
-              </Link>
-            </Box>
-            {/* <Typography variant="body2" fontWeight={600} gutterBottom>
-              Newsletter
-            </Typography>
-            <Typography variant="body2" color="text.secondary" mb={2}>
-              Subscribe to our newsletter for weekly updates and promotions.
-            </Typography>
-            <Stack direction="row" spacing={1} useFlexGap>
-              <TextField
-                id="outlined-basic"
-                hiddenLabel
-                size="small"
-                variant="outlined"
-                fullWidth
-                aria-label="Enter your email address"
-                placeholder="Your email address"
-                inputProps={{
-                  autoComplete: "off",
-                  arialabel: "Enter your email address",
-                }}
+          <Box sx={{ width: { xs: "100%", sm: "20%" } }}>
+            <Link href="/" underline="hover">
+              <img
+                src="/logo.png"
+                style={{ width: "140px", height: "auto" }}
+                alt="Логотип"
               />
-              <Button
-                variant="contained"
-                color="primary"
-                sx={{ flexShrink: 0 }}
-              >
-                Subscribe
-              </Button>
-            </Stack> */}
+            </Link>
           </Box>
         </Box>
         <Box
@@ -106,13 +69,13 @@ const Footer = () => {
           <Typography variant="body2" fontWeight={600}>
             Продукт
           </Typography>
-          <Link color="text.secondary" href="#">
+          <Link color="text.secondary" href="/lots">
             Лоти
           </Link>
-          <Link color="text.secondary" href="#">
+          <Link color="text.secondary" href="/sell-on-bid&win">
             Продати на Bid&Win
           </Link>
-          <Link color="text.secondary" href="#">
+          <Link color="text.secondary" href="/buying-tips">
             Поради щодо купівлі
           </Link>
         </Box>
@@ -126,7 +89,7 @@ const Footer = () => {
           <Typography variant="body2" fontWeight={600}>
             Компанія
           </Typography>
-          <Link color="text.secondary" href="#">
+          <Link color="text.secondary" href="/about-us">
             Про нас
           </Link>
         </Box>
@@ -140,13 +103,13 @@ const Footer = () => {
           <Typography variant="body2" fontWeight={600}>
             Правові
           </Typography>
-          <Link color="text.secondary" href="#">
+          <Link color="text.secondary" href="/conditions">
             Умови
           </Link>
-          <Link color="text.secondary" href="#">
+          <Link color="text.secondary" href="/privacy">
             Конфіденційність
           </Link>
-          <Link color="text.secondary" href="#">
+          <Link color="text.secondary" href="/about-us">
             Контакти
           </Link>
         </Box>
@@ -162,13 +125,13 @@ const Footer = () => {
         }}
       >
         <div>
-          <Link color="text.secondary" href="#">
+          <Link color="text.secondary" href="/privacy">
             Політика конфіденційності
           </Link>
           <Typography display="inline" sx={{ mx: 0.5, opacity: 0.5 }}>
             &nbsp;•&nbsp;
           </Typography>
-          <Link color="text.secondary" href="#">
+          <Link color="text.secondary" href="/conditions">
             Умови надання послуг
           </Link>
           <Copyright />
@@ -184,7 +147,7 @@ const Footer = () => {
         >
           <IconButton
             color="inherit"
-            href="https://github.com/mui"
+            href="https://github.com/hrunytskyidmytro"
             aria-label="GitHub"
             sx={{ alignSelf: "center" }}
           >
@@ -192,15 +155,7 @@ const Footer = () => {
           </IconButton>
           <IconButton
             color="inherit"
-            href="https://twitter.com/MaterialUI"
-            aria-label="X"
-            sx={{ alignSelf: "center" }}
-          >
-            <TwitterIcon />
-          </IconButton>
-          <IconButton
-            color="inherit"
-            href="https://www.linkedin.com/company/mui/"
+            href="https://www.linkedin.com/in/dmytro-hrunytskyi/"
             aria-label="LinkedIn"
             sx={{ alignSelf: "center" }}
           >
