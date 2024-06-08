@@ -1,23 +1,91 @@
-import React from "react";
-import { Grid, Box, Container, Button, Pagination } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { Grid, Box, Container } from "@mui/material";
 import { useParams } from "react-router-dom";
-import { useAuth } from "../../shared/hooks/useAuth";
 import { useGetLotsByCategoryQuery } from "../../api/categoryApi";
 
 import Breadcrumbs from "../../shared/components/UIElements/Breadcrumbs";
 import MessageSnackbar from "../../shared/components/UIElements/MessageSnackbar";
 
-import LotCard from "../components/LotCard";
+import FilterPanel from "../components/FilterPanel";
+import LotList from "../components/LotList";
+import PaginationSection from "../../shared/components/UIElements/PaginationSection";
+import SearchAndSortPanel from "../components/SearchAndSortPanel";
+import LotsSkeleton from "../components/LotsSkeleton";
 
 const LotsPageByCategory = () => {
   const { id } = useParams();
-  const { user } = useAuth();
+  const [page, setPage] = useState(1);
+  const [sortBy, setSortBy] = useState("");
+  const [currentPriceRange, setCurrentPriceRange] = useState([0, 1000]);
+  const [buyNowPriceRange, setBuyNowPriceRange] = useState([0, 1000]);
+  const [dateOption, setDateOption] = useState("all");
+  const [selectedStatuses, setSelectedStatuses] = useState([]);
+  const [search, setSearch] = useState("");
+  const [openErrorAlert, setOpenErrorAlert] = useState(false);
 
-  const { data: lots, error, isLoading } = useGetLotsByCategoryQuery(id);
+  const {
+    data: { lots: lotsData, totalPages } = {},
+    error,
+    isLoading,
+  } = useGetLotsByCategoryQuery({
+    categoryId: id,
+    page,
+    sortBy,
+    currentPriceFrom: currentPriceRange[0],
+    currentPriceTo: currentPriceRange[1],
+    buyNowPriceFrom: buyNowPriceRange[0],
+    buyNowPriceTo: buyNowPriceRange[1],
+    dateOption,
+    status: selectedStatuses,
+    search,
+  });
+
+  useEffect(() => {
+    if (error) {
+      setOpenErrorAlert(true);
+    }
+  }, [error]);
+
+  const handleChangePage = (event, value) => {
+    setPage(value);
+  };
+
+  const handleChangeSort = (event) => {
+    setSortBy(event.target.value);
+  };
+
+  const handleChangeCurrentPriceRange = (event, newValue) => {
+    setCurrentPriceRange(newValue);
+  };
+
+  const handleChangeBuyNowPriceRange = (event, newValue) => {
+    setBuyNowPriceRange(newValue);
+  };
+
+  const handleChangeDateOption = (event) => {
+    setDateOption(event.target.value);
+  };
+
+  const handleSearch = (event) => {
+    setSearch(event.target.value);
+  };
+
+  const handleStatusChange = (event) => {
+    const status = event.target.value;
+    setSelectedStatuses((prevStatuses) =>
+      prevStatuses.includes(status)
+        ? prevStatuses.filter((s) => s !== status)
+        : [...prevStatuses, status]
+    );
+  };
+
+  if (isLoading) {
+    return <LotsSkeleton />;
+  }
 
   return (
     <Container
-      id="lots"
+      id="lots_by_category"
       sx={{
         display: "flex",
         flexDirection: "column",
@@ -42,47 +110,38 @@ const LotsPageByCategory = () => {
             </Box>
           </Grid>
           <Grid item xs={12}>
-            <Box
-              sx={{
-                mt: 1,
-                display: "flex",
-                justifyContent: "flex-end",
-                alignItems: "center",
-                width: "100%",
-              }}
-            >
-              <Button>Сортування</Button>
-            </Box>
+            <SearchAndSortPanel
+              search={search}
+              handleSearch={handleSearch}
+              sortBy={sortBy}
+              handleChangeSort={handleChangeSort}
+            />
           </Grid>
-          {lots &&
-            lots.map((lot) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={lot.id}>
-                <LotCard lot={lot} />
-              </Grid>
-            ))}
+          <Grid item xs={12} md={3}>
+            <FilterPanel
+              currentPriceRange={currentPriceRange}
+              handleChangeCurrentPriceRange={handleChangeCurrentPriceRange}
+              buyNowPriceRange={buyNowPriceRange}
+              handleChangeBuyNowPriceRange={handleChangeBuyNowPriceRange}
+              dateOption={dateOption}
+              handleChangeDateOption={handleChangeDateOption}
+              selectedStatuses={selectedStatuses}
+              handleStatusChange={handleStatusChange}
+            />
+          </Grid>
+          <Grid item xs={12} md={9}>
+            <LotList lotsData={lotsData} />
+          </Grid>
           <Grid item xs={12}>
-            <Box
-              sx={{
-                mt: 5,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                width: "100%",
-              }}
-            >
-              <Pagination
-                // count={Math.ceil(total / limit)}
-                count={10}
-                // page={page}
-                // onChange={handlePageChange}
-                variant="outlined"
-                color="primary"
-              />
-            </Box>
+            <PaginationSection
+              totalPages={totalPages}
+              page={page}
+              handleChangePage={handleChangePage}
+            />
           </Grid>
         </Grid>
       </Box>
-      {/* <MessageSnackbar
+      <MessageSnackbar
         open={openErrorAlert}
         onClose={() => setOpenErrorAlert(false)}
         severity="error"
@@ -90,7 +149,7 @@ const LotsPageByCategory = () => {
           error?.data?.message ||
           "Виникла помилка. Будь ласка, спробуйте ще раз."
         }
-      /> */}
+      />
     </Container>
   );
 };
