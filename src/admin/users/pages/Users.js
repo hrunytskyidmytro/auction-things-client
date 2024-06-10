@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
-
 import { parsePhoneNumberFromString } from "libphonenumber-js";
-
 import { DataGrid } from "@mui/x-data-grid";
 import { ukUA } from "@mui/x-data-grid/locales";
 import {
@@ -9,20 +7,25 @@ import {
   CircularProgress,
   Button,
   Modal,
-  Snackbar,
-  Alert,
   Typography,
   Chip,
+  Tooltip,
 } from "@mui/material";
 import EditTwoToneIcon from "@mui/icons-material/EditTwoTone";
 import DeleteOutlineTwoToneIcon from "@mui/icons-material/DeleteOutlineTwoTone";
-import FileCopyIcon from "@mui/icons-material/FileCopy";
-
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import LockIcon from "@mui/icons-material/Lock";
+import LockOpenIcon from "@mui/icons-material/LockOpen";
 import { useNavigate } from "react-router-dom";
 import {
   useGetAllUsersQuery,
   useDeleteUserMutation,
+  useBlockUserMutation,
+  useUnblockUserMutation,
 } from "../../../api/userApi";
+import MessageSnackbar from "../../../shared/components/UIElements/MessageSnackbar";
+import LoadingSpinner from "../../../shared/components/UIElements/LoadingSpinner";
 
 const style = {
   position: "absolute",
@@ -40,15 +43,23 @@ const Users = () => {
   const { data: users, error, isLoading, refetch } = useGetAllUsersQuery();
   const [deleteUser, { isLoading: isDeleting, error: isError }] =
     useDeleteUserMutation();
-  const navigate = useNavigate();
+  const [blockUser] = useBlockUserMutation();
+  const [unblockUser] = useUnblockUserMutation();
 
+  const navigate = useNavigate();
   const [openErrorAlert, setOpenErrorAlert] = useState(false);
   const [openErrorAlertForDeleting, setOpenErrorAlertForDeleting] =
     useState(false);
-
   const [openDeleteConfirmation, setOpenDeleteConfirmation] = useState(false);
   const [isDeletingUsers, setIsDeletingUsers] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState([]);
+  const [isCopied, setIsCopied] = useState(false);
+
+  const handleCopy = (text) => {
+    navigator.clipboard.writeText(text);
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 3000);
+  };
 
   const handleDeleteSelectedUsers = () => {
     setOpenDeleteConfirmation(true);
@@ -73,6 +84,24 @@ const Users = () => {
     setIsDeletingUsers(false);
   };
 
+  const handleBlockUser = async (id) => {
+    try {
+      await blockUser(id).unwrap();
+      refetch();
+    } catch (error) {
+      setOpenErrorAlert(true);
+    }
+  };
+
+  const handleUnblockUser = async (id) => {
+    try {
+      await unblockUser(id).unwrap();
+      refetch();
+    } catch (error) {
+      setOpenErrorAlert(true);
+    }
+  };
+
   useEffect(() => {
     refetch();
     if (error) {
@@ -84,56 +113,7 @@ const Users = () => {
   }, [error, isError, refetch]);
 
   if (isLoading) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
-        <CircularProgress size={50} thickness={3.6} />
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Snackbar
-        open={openErrorAlert}
-        autoHideDuration={5000}
-        onClose={() => setOpenErrorAlert(false)}
-      >
-        <Alert
-          onClose={() => setOpenErrorAlert(false)}
-          severity="error"
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {error?.data?.message}
-        </Alert>
-      </Snackbar>
-    );
-  }
-
-  if (isError) {
-    return (
-      <Snackbar
-        open={openErrorAlertForDeleting}
-        autoHideDuration={5000}
-        onClose={() => setOpenErrorAlertForDeleting(false)}
-      >
-        <Alert
-          onClose={() => setOpenErrorAlertForDeleting(false)}
-          severity="error"
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {isError?.data?.message}
-        </Alert>
-      </Snackbar>
-    );
+    return <LoadingSpinner size={50} />;
   }
 
   const columns = [
@@ -152,10 +132,14 @@ const Users = () => {
       renderCell: (params) => (
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Typography variant="body2">{params.value}</Typography>
-          <FileCopyIcon
-            onClick={() => navigator.clipboard.writeText(params.value)}
-            sx={{ cursor: "pointer", ml: 1, color: "primary" }}
-          />
+          <Tooltip
+            title={isCopied ? "Скопійовано" : "Копіювати"}
+            onClick={() => handleCopy(params.value)}
+          >
+            <ContentCopyIcon
+              sx={{ cursor: "pointer", ml: 1, color: "primary" }}
+            />
+          </Tooltip>
         </Box>
       ),
     },
@@ -195,9 +179,17 @@ const Users = () => {
     {
       field: "actions",
       headerName: "Дії",
-      width: 150,
+      width: 300,
       renderCell: (params) => (
         <Box sx={{ display: "flex", justifyContent: "space-around" }}>
+          <Button
+            variant="contained"
+            color="primary"
+            sx={{ m: 1 }}
+            onClick={() => navigate(`/admin/users/info/${params.row.id}`)}
+          >
+            <VisibilityIcon />
+          </Button>
           <Button
             variant="contained"
             color="primary"
@@ -206,6 +198,25 @@ const Users = () => {
           >
             <EditTwoToneIcon />
           </Button>
+          {params.row.isBlocked ? (
+            <Button
+              variant="contained"
+              color="error"
+              sx={{ m: 1 }}
+              onClick={() => handleUnblockUser(params.row.id)}
+            >
+              <LockIcon />
+            </Button>
+          ) : (
+            <Button
+              variant="contained"
+              color="success"
+              sx={{ m: 1 }}
+              onClick={() => handleBlockUser(params.row.id)}
+            >
+              <LockOpenIcon />
+            </Button>
+          )}
         </Box>
       ),
     },
@@ -214,14 +225,6 @@ const Users = () => {
   return (
     <>
       <Box sx={{ height: "100hv", width: "100%", mb: 5 }}>
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={() => navigate("/admin/users/new")}
-          sx={{ mb: 2, mr: 1 }}
-        >
-          Додати користувача
-        </Button>
         {selectedUsers.length > 0 && (
           <Button
             variant="contained"
@@ -232,19 +235,27 @@ const Users = () => {
             <DeleteOutlineTwoToneIcon />
           </Button>
         )}
-        <DataGrid
-          rows={users || []}
-          columns={columns}
-          pageSize={10}
-          rowsPerPageOptions={[5, 10, 20]}
-          checkboxSelection
-          onRowSelectionModelChange={(newSelection) => {
-            setSelectedUsers(newSelection);
-          }}
-          disableRowSelectionOnClick
-          getRowId={(row) => row.id}
-          localeText={ukUA.components.MuiDataGrid.defaultProps.localeText}
-        />
+        {!users || users.length === 0 ? (
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="h5" align="center" fontWeight={600}>
+              Список користувачів порожній!
+            </Typography>
+          </Box>
+        ) : (
+          <DataGrid
+            rows={users || []}
+            columns={columns}
+            pageSize={10}
+            rowsPerPageOptions={[5, 10, 20]}
+            checkboxSelection
+            onRowSelectionModelChange={(newSelection) => {
+              setSelectedUsers(newSelection);
+            }}
+            disableRowSelectionOnClick
+            getRowId={(row) => row.id}
+            localeText={ukUA.components.MuiDataGrid.defaultProps.localeText}
+          />
+        )}
       </Box>
       <Modal
         open={openDeleteConfirmation}
@@ -285,6 +296,18 @@ const Users = () => {
           )}
         </Box>
       </Modal>
+      <MessageSnackbar
+        open={openErrorAlert}
+        onClose={() => setOpenErrorAlert(false)}
+        severity="error"
+        message={error?.data?.message}
+      />
+      <MessageSnackbar
+        open={openErrorAlertForDeleting}
+        onClose={() => setOpenErrorAlertForDeleting(false)}
+        severity="error"
+        message={isError?.data?.message}
+      />
     </>
   );
 };

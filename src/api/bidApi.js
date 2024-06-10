@@ -9,13 +9,6 @@ export const bidApi = api.injectEndpoints({
         body: data,
       }),
     }),
-    updateBid: builder.mutation({
-      query: ({ id, ...data }) => ({
-        url: `/bids/${id}`,
-        method: "PATCH",
-        body: data,
-      }),
-    }),
     deleteBid: builder.mutation({
       query: (id) => ({
         url: `/bids/${id}`,
