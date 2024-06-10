@@ -30,6 +30,18 @@ export const paymentApi = api.injectEndpoints({
         body: { amount, payment_method_id },
       }),
     }),
+    getAllPayments: builder.query({
+      query: () => ({
+        url: "/payments/",
+        method: "GET",
+      }),
+    }),
+    deletePayment: builder.mutation({
+      query: (id) => ({
+        url: `/payments/${id}`,
+        method: "DELETE",
+      }),
+    }),
   }),
 });
 
@@ -38,4 +50,6 @@ export const {
   useAddFundsMutation,
   useWithdrawFundsMutation,
   useConfirmPurchaseMutation,
+  useGetAllPaymentsQuery,
+  useDeletePaymentMutation,
 } = paymentApi;

@@ -42,6 +42,12 @@ export const userApi = api.injectEndpoints({
         method: "GET",
       }),
     }),
+    getUserById: builder.query({
+      query: (id) => ({
+        url: `/user/${id}`,
+        method: "GET",
+      }),
+    }),
     updateUser: builder.mutation({
       query: ({ id, ...data }) => ({
         url: `/user/${id}`,
@@ -53,6 +59,18 @@ export const userApi = api.injectEndpoints({
       query: (id) => ({
         url: `/user/${id}`,
         method: "DELETE",
+      }),
+    }),
+    blockUser: builder.mutation({
+      query: (id) => ({
+        url: `/user/block/${id}`,
+        method: "PATCH",
+      }),
+    }),
+    unblockUser: builder.mutation({
+      query: (id) => ({
+        url: `/user/unblock/${id}`,
+        method: "PATCH",
       }),
     }),
   }),
@@ -67,4 +85,7 @@ export const {
   useGetAllUsersQuery,
   useUpdateUserMutation,
   useDeleteUserMutation,
+  useGetUserByIdQuery,
+  useBlockUserMutation,
+  useUnblockUserMutation,
 } = userApi;
