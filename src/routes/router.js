@@ -21,12 +21,23 @@ import NotFoundPage from "../shared/pages/NotFoundPage";
 import Lots from "../admin/lots/pages/Lots";
 import NewLot from "../admin/lots/pages/NewLot";
 import UpdateLot from "../admin/lots/pages/UpdateLot";
+import LotInfo from "../admin/lots/pages/LotInfo";
 
 import Users from "../admin/users/pages/Users";
+import UpdateUser from "../admin/users/pages/UpdateUser";
+import UserInfo from "../admin/users/pages/UserInfo";
 
 import Categories from "../admin/categories/pages/Categories";
+import NewCategory from "../admin/categories/pages/NewCategory";
+import UpdateCategory from "../admin/categories/pages/UpdateCategory";
+import Categorynfo from "../admin/categories/pages/CategoryInfo";
 
 import Bids from "../admin/bids/pages/Bids";
+import AuctionHistories from "../admin/auctionHistories/pages/AuctionHistories";
+import Payments from "../admin/payments/pages/Payments";
+import Orders from "../admin/orders/pages/Orders";
+import Statistics from "../admin/statistics/pages/Statistics";
+import MainAdmin from "../admin/main/pages/MainAdmin";
 
 import Home from "../home/pages/Home";
 import CategoriesList from "../home/components/CategoriesList";
@@ -225,6 +236,10 @@ export const router = createBrowserRouter([
     element: <AdminLayout />,
     children: [
       {
+        index: true,
+        element: <MainAdmin />,
+      },
+      {
         path: "lots",
         children: [
           {
@@ -239,6 +254,15 @@ export const router = createBrowserRouter([
             path: ":id",
             element: <UpdateLot />,
           },
+          {
+            path: "info",
+            children: [
+              {
+                path: ":id",
+                element: <LotInfo />,
+              },
+            ],
+          },
         ],
       },
       {
@@ -248,14 +272,19 @@ export const router = createBrowserRouter([
             index: true,
             element: <Users />,
           },
-          // {
-          //   path: "new",
-          //   element: <NewLot />,
-          // },
-          // {
-          //   path: ":id",
-          //   element: <UpdateLot />,
-          // },
+          {
+            path: ":id",
+            element: <UpdateUser />,
+          },
+          {
+            path: "info",
+            children: [
+              {
+                path: ":id",
+                element: <UserInfo />,
+              },
+            ],
+          },
         ],
       },
       {
@@ -265,14 +294,23 @@ export const router = createBrowserRouter([
             index: true,
             element: <Categories />,
           },
-          // {
-          //   path: "new",
-          //   element: <NewLot />,
-          // },
-          // {
-          //   path: ":id",
-          //   element: <UpdateLot />,
-          // },
+          {
+            path: "new",
+            element: <NewCategory />,
+          },
+          {
+            path: ":id",
+            element: <UpdateCategory />,
+          },
+          {
+            path: "info",
+            children: [
+              {
+                path: ":id",
+                element: <Categorynfo />,
+              },
+            ],
+          },
         ],
       },
       {
@@ -282,14 +320,42 @@ export const router = createBrowserRouter([
             index: true,
             element: <Bids />,
           },
-          // {
-          //   path: "new",
-          //   element: <NewLot />,
-          // },
-          // {
-          //   path: ":id",
-          //   element: <UpdateLot />,
-          // },
+        ],
+      },
+      {
+        path: "statistics",
+        children: [
+          {
+            index: true,
+            element: <Statistics />,
+          },
+        ],
+      },
+      {
+        path: "auction-histories",
+        children: [
+          {
+            index: true,
+            element: <AuctionHistories />,
+          },
+        ],
+      },
+      {
+        path: "payments",
+        children: [
+          {
+            index: true,
+            element: <Payments />,
+          },
+        ],
+      },
+      {
+        path: "orders",
+        children: [
+          {
+            index: true,
+            element: <Orders />,
+          },
         ],
       },
     ],

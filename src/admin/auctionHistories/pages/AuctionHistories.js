@@ -5,13 +5,16 @@ import {
   Box,
   CircularProgress,
   Button,
-  Modal,
   Typography,
+  Modal,
 } from "@mui/material";
 import DeleteOutlineTwoToneIcon from "@mui/icons-material/DeleteOutlineTwoTone";
-import { useDeleteBidMutation, useGetAllBidsQuery } from "../../../api/bidApi";
-import MessageSnackbar from "../../../shared/components/UIElements/MessageSnackbar";
+import {
+  useGetAllAuctionHistoriesQuery,
+  useDeleteAuctionHistoryMutation,
+} from "../../../api/auctionHistoryApi";
 import LoadingSpinner from "../../../shared/components/UIElements/LoadingSpinner";
+import MessageSnackbar from "../../../shared/components/UIElements/MessageSnackbar";
 
 const style = {
   position: "absolute",
@@ -25,20 +28,27 @@ const style = {
   p: 4,
 };
 
-const Bids = () => {
-  const { data: bids, error, isLoading, refetch } = useGetAllBidsQuery();
-  const [deleteBid, { isLoading: isDeleting, error: isError }] =
-    useDeleteBidMutation();
+const AuctionHistories = () => {
+  const {
+    data: auctionHistories,
+    error,
+    isLoading,
+    refetch,
+  } = useGetAllAuctionHistoriesQuery();
+
+  const [deleteAuctionHistory, { isLoading: isDeleting, error: isError }] =
+    useDeleteAuctionHistoryMutation();
 
   const [openErrorAlert, setOpenErrorAlert] = useState(false);
   const [openErrorAlertForDeleting, setOpenErrorAlertForDeleting] =
     useState(false);
 
   const [openDeleteConfirmation, setOpenDeleteConfirmation] = useState(false);
-  const [isDeletingBids, setIsDeletingBids] = useState(false);
-  const [selectedBids, setSelectedBids] = useState([]);
+  const [isDeletingAuctionHistories, setIsDeletingAuctionHistories] =
+    useState(false);
+  const [selectedAuctionHistories, setSelectedAuctionHistories] = useState([]);
 
-  const handleDeleteSelectedBids = () => {
+  const handleDeleteSelectedAuctionHistories = () => {
     setOpenDeleteConfirmation(true);
   };
 
@@ -47,18 +57,18 @@ const Bids = () => {
   };
 
   const handleConfirmDelete = async () => {
-    setIsDeletingBids(true);
+    setIsDeletingAuctionHistories(true);
     try {
-      for (const id of selectedBids) {
-        await deleteBid(id).unwrap();
+      for (const id of selectedAuctionHistories) {
+        await deleteAuctionHistory(id).unwrap();
       }
-      setSelectedBids([]);
+      setSelectedAuctionHistories([]);
       refetch();
       handleCloseModalForDeleting();
     } catch (error) {
       setOpenErrorAlertForDeleting(true);
     }
-    setIsDeletingBids(false);
+    setIsDeletingAuctionHistories(false);
   };
 
   useEffect(() => {
@@ -78,54 +88,59 @@ const Bids = () => {
   const columns = [
     { field: "id", headerName: "ID", width: 90 },
     {
-      field: "amount",
-      headerName: "Ставка",
-      width: 250,
-      valueGetter: (params) => `${params.row.amount} грн.`,
-    },
-    {
       field: "lot",
       headerName: "Лот",
       width: 500,
       valueGetter: (params) => params.row.Lot.title,
     },
     {
-      field: "user",
-      headerName: "Користувач",
-      width: 250,
-      valueGetter: (params) =>
-        `${params.row.User.firstName} ${params.row.User.lastName}`,
+      field: "bid",
+      headerName: "Ставка",
+      width: 200,
+      valueGetter: (params) => `${params.row.Bid.amount} грн.`,
+    },
+    {
+      field: "oldPrice",
+      headerName: "Початкова ставка",
+      width: 200,
+      valueGetter: (params) => `${params.row.oldPrice} грн.`,
+    },
+    {
+      field: "newPrice",
+      headerName: "Поточна ставка",
+      width: 200,
+      valueGetter: (params) => `${params.row.newPrice} грн.`,
     },
   ];
 
   return (
     <>
       <Box sx={{ height: "100hv", width: "100%", mb: 5 }}>
-        {selectedBids.length > 0 && (
+        {selectedAuctionHistories.length > 0 && (
           <Button
             variant="contained"
             color="error"
             sx={{ mb: 2 }}
-            onClick={handleDeleteSelectedBids}
+            onClick={handleDeleteSelectedAuctionHistories}
           >
             <DeleteOutlineTwoToneIcon />
           </Button>
         )}
-        {!bids || bids.length === 0 ? (
+        {!auctionHistories || auctionHistories.length === 0 ? (
           <Box sx={{ mt: 2 }}>
             <Typography variant="h5" align="center" fontWeight={600}>
-              Список ставок порожній!
+              Список історії лотів порожній!
             </Typography>
           </Box>
         ) : (
           <DataGrid
-            rows={bids || []}
+            rows={auctionHistories || []}
             columns={columns}
             pageSize={10}
             rowsPerPageOptions={[5, 10, 20]}
             checkboxSelection
             onRowSelectionModelChange={(newSelection) => {
-              setSelectedBids(newSelection);
+              setSelectedAuctionHistories(newSelection);
             }}
             disableRowSelectionOnClick
             getRowId={(row) => row.id}
@@ -141,12 +156,12 @@ const Bids = () => {
       >
         <Box sx={style}>
           <Typography variant="h6" gutterBottom>
-            Видалити ставку/и?
+            Видалити історію/ї?
           </Typography>
           <Typography variant="body2">
-            Ви впевнені, що хочете видалити цю ставку/и? Ця дія є незворотньою.
+            Ви впевнені, що хочете видалити цю історію/ї? Ця дія є незворотньою.
           </Typography>
-          {isDeletingBids ? (
+          {isDeletingAuctionHistories ? (
             <Box sx={{ mt: 2, display: "flex", justifyContent: "center" }}>
               <CircularProgress size={30} thickness={3.6} />
             </Box>
@@ -175,16 +190,22 @@ const Bids = () => {
         open={openErrorAlert}
         onClose={() => setOpenErrorAlert(false)}
         severity="error"
-        message={error?.data?.message}
+        message={
+          error?.data?.message ||
+          "Виникла помилка. Будь ласка, спробуйте ще раз."
+        }
       />
       <MessageSnackbar
         open={openErrorAlertForDeleting}
         onClose={() => setOpenErrorAlertForDeleting(false)}
         severity="error"
-        message={isError?.data?.message}
+        message={
+          isError?.data?.message ||
+          "Виникла помилка. Будь ласка, спробуйте ще раз."
+        }
       />
     </>
   );
 };
 
-export default Bids;
+export default AuctionHistories;
