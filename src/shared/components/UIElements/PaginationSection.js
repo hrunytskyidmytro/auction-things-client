@@ -10,6 +10,7 @@ const PaginationSection = ({ totalPages, page, handleChangePage }) => {
         justifyContent: "center",
         alignItems: "center",
         width: "100%",
+        mb: 5,
       }}
     >
       <Pagination

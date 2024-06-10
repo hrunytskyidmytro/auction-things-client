@@ -57,7 +57,7 @@ const FilterPanel = ({
               aria-labelledby="current-price-range-slider"
               getAriaValueText={(value) => `${value} грн`}
               min={0}
-              max={1000}
+              max={2000}
             />
           </FormControl>
           <FormControl fullWidth sx={{ mb: 2 }}>
@@ -77,7 +77,7 @@ const FilterPanel = ({
               aria-labelledby="buy-now-price-range-slider"
               getAriaValueText={(value) => `${value} грн`}
               min={0}
-              max={1000}
+              max={2000}
             />
           </FormControl>
           <Divider sx={{ mb: 2 }} />

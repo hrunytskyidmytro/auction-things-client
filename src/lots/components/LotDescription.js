@@ -8,9 +8,11 @@ const LotDescription = ({ lot }) => {
         <Typography variant="h6" fontWeight={600} gutterBottom>
           Опис
         </Typography>
-        <Typography variant="body1" paragraph>
-          {lot?.description}
-        </Typography>
+        <div
+          dangerouslySetInnerHTML={{
+            __html: lot?.description || "",
+          }}
+        />
       </Box>
     </>
   );

@@ -31,8 +31,8 @@ const UserLots = () => {
   const { user } = useAuth();
   const [page, setPage] = useState(1);
   const [sortBy, setSortBy] = useState("");
-  const [currentPriceRange, setCurrentPriceRange] = useState([0, 1000]);
-  const [buyNowPriceRange, setBuyNowPriceRange] = useState([0, 1000]);
+  const [currentPriceRange, setCurrentPriceRange] = useState([0, 2000]);
+  const [buyNowPriceRange, setBuyNowPriceRange] = useState([0, 2000]);
   const [dateOption, setDateOption] = useState("all");
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedStatuses, setSelectedStatuses] = useState([]);
