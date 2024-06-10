@@ -3,81 +3,76 @@ import { useParams } from "react-router-dom";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import {
   TextField,
-  FormControl,
-  InputLabel,
   Box,
-  Snackbar,
-  Alert,
+  InputLabel,
+  Select,
+  MenuItem,
+  FormControl,
+  InputAdornment,
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
-import { Dropzone, FileMosaic } from "@files-ui/react";
-
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import "@ckeditor/ckeditor5-build-classic/build/translations/uk";
 import { useNavigate } from "react-router-dom";
-
 import { useGetLotByIdQuery, useUpdateLotMutation } from "../../../api/lotApi";
-
-import { validationSchemaForNewLot } from "../../../shared/utils/validatorsSchemes";
+import { useGetAllCategoriesQuery } from "../../../api/categoryApi";
+import { validationSchemaForUpdateLot } from "../../../shared/utils/validatorsSchemes";
+import MessageSnackbar from "../../../shared/components/UIElements/MessageSnackbar";
+import LoadingSpinner from "../../../shared/components/UIElements/LoadingSpinner";
+import Breadcrumbs from "../../../shared/components/UIElements/Breadcrumbs";
 
 const UpdateLot = () => {
   const { id } = useParams();
+
   const {
     data: lot,
     isLoading: isFetching,
     error: fetchError,
+    refetch: refetchLot,
   } = useGetLotByIdQuery(id);
-  
+
   const [updateLot, { isLoading, error }] = useUpdateLotMutation();
 
+  const {
+    data: categoriesData,
+    isLoading: isCategoriesLoading,
+    error: categoriesError,
+    refetch: refetchCategories,
+  } = useGetAllCategoriesQuery();
+
   const navigate = useNavigate();
-
-  const [files, setFiles] = useState([]);
-  const [existingImages, setExistingImages] = useState([]);
-
   const [openSuccessAlert, setOpenSuccessAlert] = useState(false);
   const [openErrorAlert, setOpenErrorAlert] = useState(false);
-
   const [successMessage, setSuccessMessage] = useState("");
-
-  // useEffect(() => {
-  //   if (lot) {
-  //     setExistingImages(lot.imageUrls);
-  //   }
-  // }, [lot]);
+  const [description, setDescription] = useState(lot?.description || "");
 
   useEffect(() => {
     if (lot) {
-      const formattedExistingImages = lot.imageUrls.map((url, index) => ({
-        id: index,
-        name: `Existing image ${index + 1}`,
-        file: { type: "image/*" },
-        source: url.startsWith("uploads") ? `/${url}` : url,
-      }));
-      setExistingImages(formattedExistingImages);
+      refetchLot();
+      refetchCategories();
+      setDescription(lot.description);
     }
-  }, [lot]);
+  }, [lot, refetchLot, refetchCategories]);
 
-  const updateFiles = (incommingFiles) => {
-    setFiles(incommingFiles);
-  };
+  useEffect(() => {
+    if (fetchError || categoriesError) {
+      setOpenErrorAlert(true);
+    }
+  }, [fetchError, categoriesError]);
 
-  const removeFile = (id) => {
-    setFiles(files.filter((x) => x.id !== id));
-    setExistingImages(existingImages.filter((x) => x.id !== id));
-  };
-
-  if (isFetching) {
-    return <div>Loading...</div>;
+  if (isFetching || isCategoriesLoading) {
+    return <LoadingSpinner size={30} />;
   }
-
-  if (fetchError) {
-    return <div>Error: {fetchError.message}</div>;
-  }
-
-  console.log(lot);
-  console.log(existingImages);
 
   return (
     <>
+      <Breadcrumbs
+        links={[
+          { label: "Лоти", url: "/admin/lots" },
+          { label: lot.title, url: `/admin/lots/${lot.id}` },
+        ]}
+      />
       <Box
         sx={{
           my: 5,
@@ -89,42 +84,23 @@ const UpdateLot = () => {
       >
         <Formik
           initialValues={{
-            title: lot.title || "",
-            description: lot.description || "",
-            startingPrice: lot.startingPrice || 0.0,
-            endDate: lot.endDate || "",
-            status: lot.status || "PENDING",
-            categoryId: lot.categoryId || "",
-            buyNowPrice: lot.buyNowPrice || "",
-            bidIncrement: lot.bidIncrement || "",
-            reservePrice: lot.reservePrice || "",
-            existingImages: lot.imageUrls || [],
+            title: lot.title,
+            description: lot.description,
+            startingPrice: lot.startingPrice,
+            endDate: lot.endDate,
+            categoryId: lot.categoryId,
+            buyNowPrice: lot.buyNowPrice,
+            bidIncrement: lot.bidIncrement,
+            reservePrice: lot.reservePrice,
           }}
-          validationSchema={validationSchemaForNewLot}
+          validationSchema={validationSchemaForUpdateLot}
           onSubmit={async (values, { setSubmitting }) => {
             try {
-              const formData = new FormData();
-              formData.append("title", values.title);
-              formData.append("description", values.description);
-              formData.append("startingPrice", values.startingPrice);
-              formData.append("endDate", values.endDate);
-              formData.append("status", "PENDING");
-              formData.append("categoryId", values.categoryId);
-              formData.append("buyNowPrice", values.buyNowPrice);
-              formData.append("bidIncrement", values.bidIncrement);
-              formData.append("reservePrice", values.reservePrice);
-
-              values.existingImages.forEach((imageUrl) => {
-                formData.append("existingImages", imageUrl);
-              });
-
-              if (files.length > 0) {
-                files.forEach((file) => {
-                  formData.append("images", file.file);
-                });
-              }
-
-              const response = await updateLot({ id, data: formData }).unwrap();
+              const response = await updateLot({
+                id,
+                ...values,
+                description,
+              }).unwrap();
               setOpenSuccessAlert(true);
               setSuccessMessage(response.message);
               navigate("/admin/lots");
@@ -136,53 +112,6 @@ const UpdateLot = () => {
         >
           {({ errors, touched, isSubmitting }) => (
             <Form>
-              <FormControl
-                fullWidth
-                margin="normal"
-                error={touched.imageFiles && Boolean(errors.imageFiles)}
-              >
-                <InputLabel shrink>Зображення</InputLabel>
-                <Dropzone
-                  onChange={updateFiles}
-                  value={existingImages}
-                  label={"Перетягніть файли сюди або натисніть, щоб вибрати"}
-                  accept={"image/*"}
-                  maxFileSize={28 * 1024 * 1024}
-                  maxFiles={5}
-                  footerConfig={{
-                    customMessage: "Підтримуються типи: png, jpeg, jpg",
-                  }}
-                  fakeUpload
-                >
-                  {/* {existingImages.map((file) => (
-                    <FileMosaic
-                      key={file.id}
-                      {...file}
-                      onDelete={() => removeFile(file.id)}
-                      info
-                      preview
-                    />
-                  ))} */}
-                  {files.map((file) => (
-                    <FileMosaic
-                      key={file.id}
-                      {...file}
-                      onDelete={() => removeFile(file.id)}
-                      info
-                      preview
-                    />
-                  ))}
-                </Dropzone>
-                <ErrorMessage
-                  name="imageFiles"
-                  component="div"
-                  style={{
-                    color: "red",
-                    fontSize: "0.75rem",
-                    marginTop: "0.25rem",
-                  }}
-                />
-              </FormControl>
               <Field
                 as={TextField}
                 label="Назва"
@@ -193,17 +122,14 @@ const UpdateLot = () => {
                 error={touched.title && Boolean(errors.title)}
                 helperText={<ErrorMessage name="title" />}
               />
-              <Field
-                as={TextField}
-                label="Опис"
-                name="description"
-                required
-                margin="normal"
-                fullWidth
-                multiline
-                rows={4}
-                error={touched.description && Boolean(errors.description)}
-                helperText={<ErrorMessage name="description" />}
+              <CKEditor
+                editor={ClassicEditor}
+                config={{ language: "uk" }}
+                data={description}
+                onChange={(event, editor) => {
+                  const data = editor.getData();
+                  setDescription(data);
+                }}
               />
               <Field
                 as={TextField}
@@ -213,6 +139,11 @@ const UpdateLot = () => {
                 required
                 margin="normal"
                 fullWidth
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">₴</InputAdornment>
+                  ),
+                }}
                 error={touched.startingPrice && Boolean(errors.startingPrice)}
                 helperText={<ErrorMessage name="startingPrice" />}
               />
@@ -224,9 +155,7 @@ const UpdateLot = () => {
                 required
                 margin="normal"
                 fullWidth
-                InputLabelProps={{
-                  shrink: true,
-                }}
+                InputLabelProps={{ shrink: true }}
                 error={touched.endDate && Boolean(errors.endDate)}
                 helperText={<ErrorMessage name="endDate" />}
                 value={
@@ -235,17 +164,21 @@ const UpdateLot = () => {
                     : ""
                 }
               />
-              <Field
-                as={TextField}
-                label="Категорія"
-                name="categoryId"
-                type="number"
-                required
-                margin="normal"
+              <FormControl
                 fullWidth
+                margin="normal"
                 error={touched.categoryId && Boolean(errors.categoryId)}
-                helperText={<ErrorMessage name="categoryId" />}
-              />
+              >
+                <InputLabel>Категорія</InputLabel>
+                <Field as={Select} name="categoryId" required>
+                  {categoriesData &&
+                    categoriesData.map((category) => (
+                      <MenuItem key={category.id} value={category.id}>
+                        {category.name}
+                      </MenuItem>
+                    ))}
+                </Field>
+              </FormControl>
               <Field
                 as={TextField}
                 label="Ціна купівлі зараз"
@@ -253,6 +186,11 @@ const UpdateLot = () => {
                 type="number"
                 margin="normal"
                 fullWidth
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">₴</InputAdornment>
+                  ),
+                }}
                 error={touched.buyNowPrice && Boolean(errors.buyNowPrice)}
                 helperText={<ErrorMessage name="buyNowPrice" />}
               />
@@ -263,6 +201,11 @@ const UpdateLot = () => {
                 type="number"
                 margin="normal"
                 fullWidth
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">₴</InputAdornment>
+                  ),
+                }}
                 error={touched.bidIncrement && Boolean(errors.bidIncrement)}
                 helperText={<ErrorMessage name="bidIncrement" />}
               />
@@ -273,16 +216,20 @@ const UpdateLot = () => {
                 type="number"
                 margin="normal"
                 fullWidth
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">₴</InputAdornment>
+                  ),
+                }}
                 error={touched.reservePrice && Boolean(errors.reservePrice)}
                 helperText={<ErrorMessage name="reservePrice" />}
               />
               <LoadingButton
                 type="submit"
                 variant="contained"
-                color="primary"
                 loading={isLoading}
                 disabled={isSubmitting}
-                sx={{ mt: 3 }}
+                sx={{ mt: 3, mb: 2 }}
               >
                 Оновити лот
               </LoadingButton>
@@ -290,34 +237,21 @@ const UpdateLot = () => {
           )}
         </Formik>
       </Box>
-      <Snackbar
+      <MessageSnackbar
         open={openSuccessAlert}
-        autoHideDuration={5000}
         onClose={() => setOpenSuccessAlert(false)}
-      >
-        <Alert
-          onClose={() => setOpenSuccessAlert(false)}
-          severity="success"
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {successMessage}
-        </Alert>
-      </Snackbar>
-      <Snackbar
+        severity="error"
+        message={successMessage}
+      />
+      <MessageSnackbar
         open={openErrorAlert}
-        autoHideDuration={5000}
         onClose={() => setOpenErrorAlert(false)}
-      >
-        <Alert
-          onClose={() => setOpenErrorAlert(false)}
-          severity="error"
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {error?.data?.message}
-        </Alert>
-      </Snackbar>
+        severity="error"
+        message={
+          error?.data?.message ||
+          "Не вдалося оновити лот. Будь ласка, спробуйте ще раз."
+        }
+      />
     </>
   );
 };

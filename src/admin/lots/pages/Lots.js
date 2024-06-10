@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ImageGallery from "react-image-gallery";
 import "react-image-gallery/styles/css/image-gallery.css";
-
 import { format } from "date-fns";
-
 import { DataGrid } from "@mui/x-data-grid";
 import { ukUA } from "@mui/x-data-grid/locales";
 import {
@@ -12,16 +10,21 @@ import {
   Button,
   Avatar,
   Modal,
-  Snackbar,
-  Alert,
   Typography,
   Chip,
 } from "@mui/material";
 import EditTwoToneIcon from "@mui/icons-material/EditTwoTone";
 import DeleteOutlineTwoToneIcon from "@mui/icons-material/DeleteOutlineTwoTone";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import LoadingSpinner from "../../../shared/components/UIElements/LoadingSpinner";
+import MessageSnackbar from "../../../shared/components/UIElements/MessageSnackbar";
 
 import { useNavigate } from "react-router-dom";
-import { useGetAllLotsQuery, useDeleteLotMutation } from "../../../api/lotApi";
+import {
+  useGetAllLotsForAdminQuery,
+  useDeleteLotMutation,
+  useToggleLotStatusMutation,
+} from "../../../api/lotApi";
 
 const style = {
   position: "absolute",
@@ -36,9 +39,16 @@ const style = {
 };
 
 const Lots = () => {
-  const { data: lots, error, isLoading, refetch } = useGetAllLotsQuery();
+  const {
+    data: lots,
+    error,
+    isLoading,
+    refetch,
+  } = useGetAllLotsForAdminQuery();
   const [deleteLot, { isLoading: isDeleting, error: isError }] =
     useDeleteLotMutation();
+  const [toggleLotStatus, { error: errorToggleStatus }] =
+    useToggleLotStatusMutation();
   const navigate = useNavigate();
 
   const [photoIndex, setPhotoIndex] = useState(0);
@@ -86,67 +96,27 @@ const Lots = () => {
     setIsDeletingLots(false);
   };
 
+  const handleToggleLotStatus = async (id) => {
+    try {
+      await toggleLotStatus(id).unwrap();
+      refetch();
+    } catch (error) {
+      setOpenErrorAlert(true);
+    }
+  };
+
   useEffect(() => {
     refetch();
-    if (error) {
+    if (error || errorToggleStatus) {
       setOpenErrorAlert(true);
     }
     if (isError) {
       setOpenErrorAlertForDeleting(true);
     }
-  }, [error, isError, refetch]);
+  }, [error, isError, errorToggleStatus, refetch]);
 
   if (isLoading) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
-        <CircularProgress size={50} thickness={3.6} />
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Snackbar
-        open={openErrorAlert}
-        autoHideDuration={5000}
-        onClose={() => setOpenErrorAlert(false)}
-      >
-        <Alert
-          onClose={() => setOpenErrorAlert(false)}
-          severity="error"
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {error?.data?.message}
-        </Alert>
-      </Snackbar>
-    );
-  }
-
-  if (isError) {
-    return (
-      <Snackbar
-        open={openErrorAlertForDeleting}
-        autoHideDuration={5000}
-        onClose={() => setOpenErrorAlertForDeleting(false)}
-      >
-        <Alert
-          onClose={() => setOpenErrorAlertForDeleting(false)}
-          severity="error"
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {isError?.data?.message}
-        </Alert>
-      </Snackbar>
-    );
+    return <LoadingSpinner sixe={50} />;
   }
 
   const columns = [
@@ -245,9 +215,17 @@ const Lots = () => {
     {
       field: "actions",
       headerName: "Дії",
-      width: 120,
+      width: 300,
       renderCell: (params) => (
         <Box sx={{ display: "flex", justifyContent: "space-around" }}>
+          <Button
+            variant="contained"
+            color="primary"
+            sx={{ m: 1 }}
+            onClick={() => navigate(`/admin/lots/info/${params.row.id}`)}
+          >
+            <VisibilityIcon />
+          </Button>
           <Button
             variant="contained"
             color="primary"
@@ -255,6 +233,14 @@ const Lots = () => {
             onClick={() => navigate(`/admin/lots/${params.row.id}`)}
           >
             <EditTwoToneIcon />
+          </Button>
+          <Button
+            variant="contained"
+            color={params.row.status === "OPEN" ? "error" : "success"}
+            sx={{ m: 1 }}
+            onClick={() => handleToggleLotStatus(params.row.id)}
+          >
+            {params.row.status === "OPEN" ? "Закрити" : "Відкрити"}
           </Button>
         </Box>
       ),
@@ -282,19 +268,27 @@ const Lots = () => {
             <DeleteOutlineTwoToneIcon />
           </Button>
         )}
-        <DataGrid
-          rows={lots || []}
-          columns={columns}
-          pageSize={10}
-          rowsPerPageOptions={[5, 10, 20]}
-          checkboxSelection
-          onRowSelectionModelChange={(newSelection) => {
-            setSelectedLots(newSelection);
-          }}
-          disableRowSelectionOnClick
-          getRowId={(row) => row.id}
-          localeText={ukUA.components.MuiDataGrid.defaultProps.localeText}
-        />
+        {!lots || lots.length === 0 ? (
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="h5" align="center" fontWeight={600}>
+              Список лотів порожній!
+            </Typography>
+          </Box>
+        ) : (
+          <DataGrid
+            rows={lots || []}
+            columns={columns}
+            pageSize={10}
+            rowsPerPageOptions={[5, 10, 20]}
+            checkboxSelection
+            onRowSelectionModelChange={(newSelection) => {
+              setSelectedLots(newSelection);
+            }}
+            disableRowSelectionOnClick
+            getRowId={(row) => row.id}
+            localeText={ukUA.components.MuiDataGrid.defaultProps.localeText}
+          />
+        )}
       </Box>
       <Modal
         open={openModal}
@@ -349,6 +343,24 @@ const Lots = () => {
           )}
         </Box>
       </Modal>
+      <MessageSnackbar
+        open={openErrorAlert}
+        onClose={() => setOpenErrorAlert(false)}
+        severity="error"
+        message={
+          error?.data?.message ||
+          "Виникла помилка. Будь ласка, спробуйте ще раз."
+        }
+      />
+      <MessageSnackbar
+        open={openErrorAlertForDeleting}
+        onClose={() => setOpenErrorAlertForDeleting(false)}
+        severity="error"
+        message={
+          isError?.data?.message ||
+          "Виникла помилка. Будь ласка, спробуйте ще раз."
+        }
+      />
     </>
   );
 };
