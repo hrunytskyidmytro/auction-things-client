@@ -105,7 +105,6 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
       <AppBar
         position="fixed"
         sx={{
-          // zIndex: 1,
           boxShadow: 0,
           bgcolor: "transparent",
           backgroundImage: "none",
@@ -327,12 +326,6 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
                           <BookmarkIcon fontSize="small" />
                         </ListItemIcon>
                         Список відстеження
-                      </MenuItem>
-                      <MenuItem onClick={handleCloseUserMenu}>
-                        <ListItemIcon>
-                          <Settings fontSize="small" />
-                        </ListItemIcon>
-                        Налаштування
                       </MenuItem>
                       <MenuItem onClick={logOut}>
                         <ListItemIcon>
