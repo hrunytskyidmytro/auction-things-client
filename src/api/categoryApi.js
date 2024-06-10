@@ -22,12 +22,6 @@ export const categoryApi = api.injectEndpoints({
         method: "DELETE",
       }),
     }),
-    getCategoryById: builder.query({
-      query: (id) => ({
-        url: `/categories/${id}`,
-        method: "GET",
-      }),
-    }),
     getAllCategories: builder.query({
       query: () => ({
         url: "/categories/",
@@ -54,6 +48,12 @@ export const categoryApi = api.injectEndpoints({
         };
       },
     }),
+    getCategoryById: builder.query({
+      query: (id) => ({
+        url: `/categories/${id}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -62,6 +62,6 @@ export const {
   useUpdateCategoryMutation,
   useDeleteCategoryMutation,
   useGetAllCategoriesQuery,
-  useGetCategoryByIdQuery,
   useGetLotsByCategoryQuery,
+  useGetCategoryByIdQuery,
 } = categoryApi;

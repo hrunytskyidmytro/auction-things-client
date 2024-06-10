@@ -96,6 +96,24 @@ export const lotApi = api.injectEndpoints({
         method: "GET",
       }),
     }),
+    getAllLotsForAdmin: builder.query({
+      query: () => ({
+        url: "/lots/admin",
+        method: "GET",
+      }),
+    }),
+    toggleLotStatus: builder.mutation({
+      query: (id) => ({
+        url: `/lots/${id}/toggle-status`,
+        method: "PATCH",
+      }),
+    }),
+    getLatestLots: builder.query({
+      query: () => ({
+        url: "/lots/latest-lots",
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -109,4 +127,7 @@ export const {
   useBuyLotNowMutation,
   useGetUserLotsQuery,
   useGetLatestOpenLotsBySellerQuery,
+  useGetAllLotsForAdminQuery,
+  useToggleLotStatusMutation,
+  useGetLatestLotsQuery,
 } = lotApi;
