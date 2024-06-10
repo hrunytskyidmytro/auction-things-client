@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
 import {
   CssBaseline,
   Box,
@@ -8,22 +7,26 @@ import {
   Typography,
   Divider,
   IconButton,
-  Badge,
   Link,
+  styled,
+  createTheme,
+  ThemeProvider,
 } from "@mui/material";
 
-import { mainListItems, secondaryListItems } from "../components/ListItems";
+import MainListItems from "../components/ListItems";
 
 import MuiDrawer from "@mui/material/Drawer";
 import MuiAppBar from "@mui/material/AppBar";
 
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import NotificationsIcon from "@mui/icons-material/Notifications";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 import { PrivateOutlet } from "../../../routes/PrivateOutlet";
+import { useAuth } from "../../../shared/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
-function Copyright(props) {
+const Copyright = (props) => {
   return (
     <Typography
       variant="body2"
@@ -39,7 +42,7 @@ function Copyright(props) {
       {"."}
     </Typography>
   );
-}
+};
 
 const drawerWidth = 240;
 
@@ -90,6 +93,8 @@ const Drawer = styled(MuiDrawer, {
 const defaultTheme = createTheme();
 
 const AdminLayout = () => {
+  const { user, isAdmin } = useAuth();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
@@ -124,13 +129,33 @@ const AdminLayout = () => {
               noWrap
               sx={{ flexGrow: 1 }}
             >
-              Аукціон речей
+              <Box
+                component="span"
+                sx={{ cursor: "pointer" }}
+                onClick={() => navigate("/")}
+              >
+                Аукціон речей Bid&Win
+              </Box>
             </Typography>
-            <IconButton color="inherit">
-              <Badge badgeContent={4} color="secondary">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
+            {user && isAdmin && (
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  bgcolor: "primary.main",
+                  color: "primary.contrastText",
+                  borderRadius: 1,
+                  p: 1,
+                  px: 2,
+                  boxShadow: 3,
+                }}
+              >
+                <AccountCircleIcon sx={{ mr: 1 }} />
+                <Typography variant="body1" noWrap>
+                  {user.email}
+                </Typography>
+              </Box>
+            )}
           </Toolbar>
         </AppBar>
         <Drawer variant="permanent" open={open}>
@@ -148,9 +173,8 @@ const AdminLayout = () => {
           </Toolbar>
           <Divider />
           <List component="nav">
-            {mainListItems}
+            <MainListItems />
             <Divider sx={{ my: 1 }} />
-            {secondaryListItems}
           </List>
         </Drawer>
         <Box
