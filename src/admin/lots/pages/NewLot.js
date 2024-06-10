@@ -1,32 +1,47 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import {
   TextField,
   FormControl,
-  InputLabel,
+  InputAdornment,
   Box,
-  Snackbar,
-  Alert,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import "@ckeditor/ckeditor5-build-classic/build/translations/uk";
 import { Dropzone, FileMosaic } from "@files-ui/react";
-
 import { useNavigate } from "react-router-dom";
-
 import { useCreateLotMutation } from "../../../api/lotApi";
-
 import { validationSchemaForNewLot } from "../../../shared/utils/validatorsSchemes";
+import { useGetAllCategoriesQuery } from "../../../api/categoryApi";
+import MessageSnackbar from "../../../shared/components/UIElements/MessageSnackbar";
+import LoadingSpinner from "../../../shared/components/UIElements/LoadingSpinner";
+import Breadcrumbs from "../../../shared/components/UIElements/Breadcrumbs";
 
 const NewLot = () => {
   const [createLot, { isLoading, error }] = useCreateLotMutation();
+  const {
+    data: categoriesData,
+    isLoading: isCategoriesLoading,
+    error: categoriesError,
+  } = useGetAllCategoriesQuery();
   const navigate = useNavigate();
 
   const [files, setFiles] = useState([]);
-
   const [openSuccessAlert, setOpenSuccessAlert] = useState(false);
   const [openErrorAlert, setOpenErrorAlert] = useState(false);
-
   const [successMessage, setSuccessMessage] = useState("");
+  const [description, setDescription] = useState("");
+
+  useEffect(() => {
+    if (categoriesError) {
+      setOpenErrorAlert(true);
+    }
+  }, [categoriesError]);
 
   const updateFiles = (incommingFiles) => {
     setFiles(incommingFiles);
@@ -36,8 +51,18 @@ const NewLot = () => {
     setFiles(files.filter((x) => x.id !== id));
   };
 
+  if (isCategoriesLoading) {
+    return <LoadingSpinner size={30} />;
+  }
+
   return (
     <>
+      <Breadcrumbs
+        links={[
+          { label: "Лоти", url: "/admin/lots" },
+          { label: "Додавання нового лоту", url: `/admin/lots/new` },
+        ]}
+      />
       <Box
         sx={{
           my: 5,
@@ -53,18 +78,18 @@ const NewLot = () => {
             description: "",
             startingPrice: 0.0,
             endDate: "",
-            status: "PENDING",
+            status: "OPEN",
             categoryId: "",
-            buyNowPrice: "",
-            bidIncrement: "",
-            reservePrice: "",
+            buyNowPrice: 0.0,
+            bidIncrement: 0.0,
+            reservePrice: 0.0,
           }}
           validationSchema={validationSchemaForNewLot}
           onSubmit={async (values, { setSubmitting }) => {
             try {
               const formData = new FormData();
               formData.append("title", values.title);
-              formData.append("description", values.description);
+              formData.append("description", description);
               formData.append("startingPrice", values.startingPrice);
               formData.append("endDate", values.endDate);
               formData.append("status", "PENDING");
@@ -96,7 +121,6 @@ const NewLot = () => {
                 margin="normal"
                 error={touched.imageFiles && Boolean(errors.imageFiles)}
               >
-                <InputLabel shrink>Зображення</InputLabel>
                 <Dropzone
                   onChange={updateFiles}
                   value={files}
@@ -139,26 +163,36 @@ const NewLot = () => {
                 error={touched.title && Boolean(errors.title)}
                 helperText={<ErrorMessage name="title" />}
               />
-              <Field
-                as={TextField}
-                label="Опис"
-                name="description"
-                required
-                margin="normal"
-                fullWidth
-                multiline
-                rows={4}
-                error={touched.description && Boolean(errors.description)}
-                helperText={<ErrorMessage name="description" />}
+              <CKEditor
+                editor={ClassicEditor}
+                config={{
+                  language: "uk",
+                  ckfinder: {
+                    // uploadUrl: "http://localhost:3000/public",
+                  },
+                }}
+                data="Тут повинен бути опис до лоту (про товар)..."
+                onReady={(editor) => {
+                  console.log("CKEditor5: ", editor);
+                }}
+                onChange={(event, editor) => {
+                  const data = editor.getData();
+                  setDescription(data);
+                }}
               />
               <Field
                 as={TextField}
                 label="Початкова ціна"
                 name="startingPrice"
                 type="number"
-                required
                 margin="normal"
+                required
                 fullWidth
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">₴</InputAdornment>
+                  ),
+                }}
                 error={touched.startingPrice && Boolean(errors.startingPrice)}
                 helperText={<ErrorMessage name="startingPrice" />}
               />
@@ -176,24 +210,34 @@ const NewLot = () => {
                 error={touched.endDate && Boolean(errors.endDate)}
                 helperText={<ErrorMessage name="endDate" />}
               />
-              <Field
-                as={TextField}
-                label="Категорія"
-                name="categoryId"
-                type="number"
-                required
-                margin="normal"
+              <FormControl
                 fullWidth
+                margin="normal"
                 error={touched.categoryId && Boolean(errors.categoryId)}
-                helperText={<ErrorMessage name="categoryId" />}
-              />
+              >
+                <InputLabel>Категорія</InputLabel>
+                <Field as={Select} name="categoryId" required>
+                  {categoriesData &&
+                    categoriesData.map((category) => (
+                      <MenuItem key={category.id} value={category.id}>
+                        {category.name}
+                      </MenuItem>
+                    ))}
+                </Field>
+              </FormControl>
               <Field
                 as={TextField}
                 label="Ціна купівлі зараз"
                 name="buyNowPrice"
                 type="number"
                 margin="normal"
+                required
                 fullWidth
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">₴</InputAdornment>
+                  ),
+                }}
                 error={touched.buyNowPrice && Boolean(errors.buyNowPrice)}
                 helperText={<ErrorMessage name="buyNowPrice" />}
               />
@@ -203,7 +247,13 @@ const NewLot = () => {
                 name="bidIncrement"
                 type="number"
                 margin="normal"
+                required
                 fullWidth
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">₴</InputAdornment>
+                  ),
+                }}
                 error={touched.bidIncrement && Boolean(errors.bidIncrement)}
                 helperText={<ErrorMessage name="bidIncrement" />}
               />
@@ -213,7 +263,13 @@ const NewLot = () => {
                 name="reservePrice"
                 type="number"
                 margin="normal"
+                required
                 fullWidth
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">₴</InputAdornment>
+                  ),
+                }}
                 error={touched.reservePrice && Boolean(errors.reservePrice)}
                 helperText={<ErrorMessage name="reservePrice" />}
               />
@@ -231,34 +287,21 @@ const NewLot = () => {
           )}
         </Formik>
       </Box>
-      <Snackbar
-        open={openSuccessAlert}
-        autoHideDuration={5000}
-        onClose={() => setOpenSuccessAlert(false)}
-      >
-        <Alert
-          onClose={() => setOpenSuccessAlert(false)}
-          severity="success"
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {successMessage}
-        </Alert>
-      </Snackbar>
-      <Snackbar
+      <MessageSnackbar
         open={openErrorAlert}
-        autoHideDuration={5000}
         onClose={() => setOpenErrorAlert(false)}
-      >
-        <Alert
-          onClose={() => setOpenErrorAlert(false)}
-          severity="error"
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {error?.data?.message}
-        </Alert>
-      </Snackbar>
+        severity="error"
+        message={
+          error?.data?.message ||
+          "Виникла помилка. Будь ласка, спробуйте ще раз."
+        }
+      />
+      <MessageSnackbar
+        open={openSuccessAlert}
+        onClose={() => setOpenSuccessAlert(false)}
+        severity="error"
+        message={successMessage}
+      />
     </>
   );
 };
