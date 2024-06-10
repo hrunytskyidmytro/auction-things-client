@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Container, Typography, Grid, Stack, Card } from "@mui/material";
+import {
+  Box,
+  Container,
+  Typography,
+  Grid,
+  Stack,
+  Card,
+  Avatar,
+} from "@mui/material";
 import { useGetAllCategoriesQuery } from "../../api/categoryApi";
 import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
 import MessageSnackbar from "../../shared/components/UIElements/MessageSnackbar";
@@ -24,12 +32,12 @@ const CategoriesList = () => {
 
   return (
     <Box
-      id="categories"
+      id="categories_list"
       sx={{
         pt: { xs: 4, sm: 12 },
         pb: { xs: 8, sm: 16 },
         color: "white",
-        bgcolor: "#06090a",
+        bgcolor: "#204EA5",
       }}
     >
       <Container
@@ -46,7 +54,7 @@ const CategoriesList = () => {
         </Typography>
         <Typography
           variant="body1"
-          sx={{ color: "grey.400", textAlign: "center" }}
+          sx={{ color: "grey.300", textAlign: "center" }}
         >
           Ласкаво просимо до нашого розділу категорій! Тут Ви знайдете
           різноманітні товари, що відповідають Вашим потребам та бажанням.
@@ -74,9 +82,8 @@ const CategoriesList = () => {
                       p: 3,
                       height: "100%",
                       border: "1px solid",
-                      borderColor: "grey.800",
+                      borderColor: "grey.200",
                       background: "transparent",
-                      backgroundColor: "grey.900",
                       cursor: "pointer",
                       transition: "box-shadow 0.3s ease-in-out",
                       "&:hover": {
@@ -85,14 +92,25 @@ const CategoriesList = () => {
                     }}
                     onClick={() => handleCategorySelect(category.id)}
                   >
-                    <Box sx={{ opacity: "50%" }}>{category.id}</Box>
                     <div>
-                      <Typography fontWeight="medium" gutterBottom>
+                      <Avatar
+                        src={`http://localhost:5001/${category.image}`}
+                        sx={{ width: 70, height: 70 }}
+                      />
+                      <Typography
+                        fontWeight="medium"
+                        sx={{ mt: 2 }}
+                        gutterBottom
+                      >
                         {category.name}
                       </Typography>
-                      <Typography variant="body2" sx={{ color: "grey.400" }}>
-                        {category.description}
-                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{ color: "grey.400" }}
+                        dangerouslySetInnerHTML={{
+                          __html: category.description || "",
+                        }}
+                      />
                     </div>
                   </Stack>
                 </Grid>
@@ -106,7 +124,7 @@ const CategoriesList = () => {
         severity="error"
         message={
           error?.data?.message ||
-          "Виникла помилка при загрузці категрій. Будь ласка, спробуйте ще раз."
+          "Виникла помилка при загрузці категорій. Будь ласка, спробуйте ще раз."
         }
       />
     </Box>
