@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from "react";
-
 import { DataGrid } from "@mui/x-data-grid";
 import { ukUA } from "@mui/x-data-grid/locales";
 import {
   Box,
   CircularProgress,
   Button,
-  Modal,
-  Snackbar,
-  Alert,
   Typography,
+  Avatar,
+  Modal,
 } from "@mui/material";
 import EditTwoToneIcon from "@mui/icons-material/EditTwoTone";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import DeleteOutlineTwoToneIcon from "@mui/icons-material/DeleteOutlineTwoTone";
 import {
   useDeleteCategoryMutation,
   useGetAllCategoriesQuery,
 } from "../../../api/categoryApi";
-
 import { useNavigate } from "react-router-dom";
+import LoadingSpinner from "../../../shared/components/UIElements/LoadingSpinner";
+import MessageSnackbar from "../../../shared/components/UIElements/MessageSnackbar";
 
 const style = {
   position: "absolute",
@@ -33,7 +33,12 @@ const style = {
 };
 
 const Categories = () => {
-  const { data: users, error, isLoading, refetch } = useGetAllCategoriesQuery();
+  const {
+    data: categories,
+    error,
+    isLoading,
+    refetch,
+  } = useGetAllCategoriesQuery();
   const [deleteCategory, { isLoading: isDeleting, error: isError }] =
     useDeleteCategoryMutation();
 
@@ -46,6 +51,18 @@ const Categories = () => {
   const [openDeleteConfirmation, setOpenDeleteConfirmation] = useState(false);
   const [isDeletingCategories, setIsDeletingCategories] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState([]);
+
+  const [imageUrl, setImageUrl] = useState("");
+  const [openImageModal, setOpenImageModal] = useState(false);
+
+  const handleImageClick = (imageUrl) => {
+    setImageUrl(imageUrl);
+    setOpenImageModal(true);
+  };
+
+  const handleCloseImageModal = () => {
+    setOpenImageModal(false);
+  };
 
   const handleDeleteSelectedCategories = () => {
     setOpenDeleteConfirmation(true);
@@ -81,68 +98,45 @@ const Categories = () => {
   }, [error, isError, refetch]);
 
   if (isLoading) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
-        <CircularProgress size={50} thickness={3.6} />
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Snackbar
-        open={openErrorAlert}
-        autoHideDuration={5000}
-        onClose={() => setOpenErrorAlert(false)}
-      >
-        <Alert
-          onClose={() => setOpenErrorAlert(false)}
-          severity="error"
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {error?.data?.message}
-        </Alert>
-      </Snackbar>
-    );
-  }
-
-  if (isError) {
-    return (
-      <Snackbar
-        open={openErrorAlertForDeleting}
-        autoHideDuration={5000}
-        onClose={() => setOpenErrorAlertForDeleting(false)}
-      >
-        <Alert
-          onClose={() => setOpenErrorAlertForDeleting(false)}
-          severity="error"
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {isError?.data?.message}
-        </Alert>
-      </Snackbar>
-    );
+    return <LoadingSpinner size={50} />;
   }
 
   const columns = [
     { field: "id", headerName: "ID", width: 90 },
     { field: "name", headerName: "Назва", width: 250 },
-    { field: "description", headerName: "Опис", width: 250 },
+    { field: "description", headerName: "Опис", width: 500 },
+    {
+      field: "image",
+      headerName: "Зображення",
+      width: 200,
+      renderCell: (params) => (
+        <div style={{ display: "flex" }}>
+          <Avatar
+            variant="square"
+            sx={{ m: 1, cursor: "pointer" }}
+            src={`http://localhost:5001/${params.value}`}
+            alt="Зображення категорії"
+            onClick={() =>
+              handleImageClick(`http://localhost:5001/${params.value}`)
+            }
+          />
+        </div>
+      ),
+    },
     {
       field: "actions",
       headerName: "Дії",
-      width: 120,
+      width: 220,
       renderCell: (params) => (
         <Box sx={{ display: "flex", justifyContent: "space-around" }}>
+          <Button
+            variant="contained"
+            color="primary"
+            sx={{ m: 1 }}
+            onClick={() => navigate(`/admin/categories/info/${params.row.id}`)}
+          >
+            <VisibilityIcon />
+          </Button>
           <Button
             variant="contained"
             color="primary"
@@ -163,7 +157,7 @@ const Categories = () => {
           variant="contained"
           color="secondary"
           onClick={() => navigate("/admin/categories/new")}
-          sx={{ mb: 2, mr: 1 }}
+          sx={{ mb: 2, mr: 1, mt: "10px" }}
         >
           Додати категорію
         </Button>
@@ -177,20 +171,51 @@ const Categories = () => {
             <DeleteOutlineTwoToneIcon />
           </Button>
         )}
-        <DataGrid
-          rows={users || []}
-          columns={columns}
-          pageSize={10}
-          rowsPerPageOptions={[5, 10, 20]}
-          checkboxSelection
-          onRowSelectionModelChange={(newSelection) => {
-            setSelectedCategories(newSelection);
-          }}
-          disableRowSelectionOnClick
-          getRowId={(row) => row.id}
-          localeText={ukUA.components.MuiDataGrid.defaultProps.localeText}
-        />
+        {!categories || categories.length === 0 ? (
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="h5" align="center" fontWeight={600}>
+              Список категорій порожній!
+            </Typography>
+          </Box>
+        ) : (
+          <DataGrid
+            rows={categories || []}
+            columns={columns}
+            pageSize={10}
+            rowsPerPageOptions={[5, 10, 20]}
+            checkboxSelection
+            onRowSelectionModelChange={(newSelection) => {
+              setSelectedCategories(newSelection);
+            }}
+            disableRowSelectionOnClick
+            getRowId={(row) => row.id}
+            localeText={ukUA.components.MuiDataGrid.defaultProps.localeText}
+          />
+        )}
       </Box>
+      <Modal
+        open={openImageModal}
+        onClose={handleCloseImageModal}
+        aria-labelledby="image-modal-title"
+        aria-describedby="image-modal-description"
+      >
+        <Box sx={style}>
+          <Typography
+            variant="h6"
+            gutterBottom
+            id="image-modal-title"
+            textAlign={"center"}
+          >
+            Зображення категорії
+          </Typography>
+          <Avatar
+            variant="square"
+            src={imageUrl}
+            alt="Зображення категорії"
+            sx={{ width: "100%", height: "auto" }}
+          />
+        </Box>
+      </Modal>
       <Modal
         open={openDeleteConfirmation}
         onClose={() => setOpenDeleteConfirmation(false)}
@@ -199,10 +224,11 @@ const Categories = () => {
       >
         <Box sx={style}>
           <Typography variant="h6" gutterBottom>
-            Видалити категорію?
+            Видалити категорію/ї?
           </Typography>
           <Typography variant="body2">
-            Ви впевнені, що хочете видалити цю категорію? Ця дія є незворотньою.
+            Ви впевнені, що хочете видалити цю категорію/ї? Ця дія є
+            незворотньою.
           </Typography>
           {isDeletingCategories ? (
             <Box sx={{ mt: 2, display: "flex", justifyContent: "center" }}>
@@ -229,6 +255,24 @@ const Categories = () => {
           )}
         </Box>
       </Modal>
+      <MessageSnackbar
+        open={openErrorAlert}
+        onClose={() => setOpenErrorAlert(false)}
+        severity="error"
+        message={
+          error?.data?.message ||
+          "Виникла помилка. Будь ласка, спробуйте ще раз."
+        }
+      />
+      <MessageSnackbar
+        open={openErrorAlertForDeleting}
+        onClose={() => setOpenErrorAlertForDeleting(false)}
+        severity="error"
+        message={
+          isError?.data?.message ||
+          "Виникла помилка. Будь ласка, спробуйте ще раз."
+        }
+      />
     </>
   );
 };
