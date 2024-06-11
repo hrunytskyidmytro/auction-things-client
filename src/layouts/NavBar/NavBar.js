@@ -19,23 +19,17 @@ import {
   alpha,
 } from "@mui/material";
 import { blue } from "@mui/material/colors";
-
 import MenuIcon from "@mui/icons-material/Menu";
-import PersonAdd from "@mui/icons-material/PersonAdd";
-import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
 import AdminPanelSettingsTwoToneIcon from "@mui/icons-material/AdminPanelSettingsTwoTone";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import GavelTwoToneIcon from "@mui/icons-material/GavelTwoTone";
-
 import ToggleColorMode from "../../shared/components/ToggleColorMode";
 import MessageSnackbar from "../../shared/components/UIElements/MessageSnackbar";
 import WatchlistModal from "../../watchlists/components/WatchlistModal";
-
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../shared/hooks/useAuth";
-
 import { useGetWatchlistByUserIdQuery } from "../../api/watchlistApi";
 
 const logoStyle = {
@@ -155,7 +149,7 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
               <Box sx={{ display: { xs: "none", md: "flex" } }}>
                 <MenuItem
                   sx={{ py: "6px", px: "12px" }}
-                  onClick={() => navigate("/lots")}
+                  onClick={() => navigate("lots")}
                 >
                   <Typography variant="body2" color="text.primary">
                     Лоти
@@ -187,7 +181,7 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
                 </MenuItem>
                 <MenuItem
                   sx={{ py: "6px", px: "12px" }}
-                  onClick={() => navigate("Faq")}
+                  onClick={() => navigate("faq")}
                 >
                   <Typography variant="body2" color="text.primary">
                     FAQ
@@ -391,11 +385,46 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
                       toggleColorMode={toggleColorMode}
                     />
                   </Box>
-                  <MenuItem>Features</MenuItem>
-                  <MenuItem>Testimonials</MenuItem>
-                  <MenuItem>Highlights</MenuItem>
-                  <MenuItem>Pricing</MenuItem>
-                  <MenuItem>FAQ</MenuItem>
+                  <MenuItem
+                    sx={{ py: "6px", px: "12px" }}
+                    onClick={handleCloseMenuAndDrawer("lots")}
+                  >
+                    <Typography variant="body2" color="text.primary">
+                      Лоти
+                    </Typography>
+                  </MenuItem>
+                  <MenuItem
+                    sx={{ py: "6px", px: "12px" }}
+                    onClick={handleCloseMenuAndDrawer("sell-on-bid&win")}
+                  >
+                    <Typography variant="body2" color="text.primary">
+                      Продати на Bid&Win
+                    </Typography>
+                  </MenuItem>
+                  <MenuItem
+                    sx={{ py: "6px", px: "12px" }}
+                    onClick={handleCloseMenuAndDrawer("buying-tips")}
+                  >
+                    <Typography variant="body2" color="text.primary">
+                      Поради щодо купівлі
+                    </Typography>
+                  </MenuItem>
+                  <MenuItem
+                    sx={{ py: "6px", px: "12px" }}
+                    onClick={handleCloseMenuAndDrawer("about-us")}
+                  >
+                    <Typography variant="body2" color="text.primary">
+                      Про нас
+                    </Typography>
+                  </MenuItem>
+                  <MenuItem
+                    sx={{ py: "6px", px: "12px" }}
+                    onClick={handleCloseMenuAndDrawer("faq")}
+                  >
+                    <Typography variant="body2" color="text.primary">
+                      FAQ
+                    </Typography>
+                  </MenuItem>
                   <Divider />
                   {isLoggedIn ? (
                     <>
@@ -466,21 +495,72 @@ const AppAppBar = ({ mode, toggleColorMode }) => {
                           <MenuItem
                             onClick={handleCloseMenuAndDrawer("/user-profile")}
                           >
-                            <Avatar sx={{ mr: 1 }} />
+                            <Avatar
+                              sx={{ mr: 1 }}
+                              alt={`${user?.firstName} ${user?.lastName}`}
+                            />
                             {`${user?.firstName} ${user?.lastName}`}
+                            {isAdmin && (
+                              <Chip
+                                label="Admin"
+                                size="small"
+                                color="primary"
+                                sx={{ m: 1 }}
+                              />
+                            )}
+                            {isSeller && (
+                              <Chip
+                                label="Seller"
+                                size="small"
+                                color="success"
+                                sx={{ m: 1 }}
+                              />
+                            )}
                           </MenuItem>
                           <Divider />
-                          <MenuItem onClick={handleCloseUserMenu}>
+                          <MenuItem
+                            onClick={handleCloseMenuAndDrawer(
+                              "/change-balance-action"
+                            )}
+                          >
                             <ListItemIcon>
-                              <PersonAdd fontSize="small" />
+                              <CreditCardIcon fontSize="small" />
                             </ListItemIcon>
-                            Додати новий аккаунт
+                            Баланс:{" "}
+                            <Chip
+                              label={`${user?.balance} грн.`}
+                              variant="outlined"
+                              sx={{ ml: 1 }}
+                            />
                           </MenuItem>
-                          <MenuItem onClick={handleCloseUserMenu}>
+                          <Divider />
+                          {isAdmin && (
+                            <MenuItem
+                              onClick={handleCloseMenuAndDrawer("/admin")}
+                            >
+                              <ListItemIcon>
+                                <AdminPanelSettingsTwoToneIcon fontSize="small" />
+                              </ListItemIcon>
+                              Адмін панель
+                            </MenuItem>
+                          )}
+                          {isSeller && (
+                            <MenuItem
+                              onClick={handleCloseMenuAndDrawer(
+                                `/seller/${user.id}`
+                              )}
+                            >
+                              <ListItemIcon>
+                                <GavelTwoToneIcon fontSize="small" />
+                              </ListItemIcon>
+                              Мої лоти
+                            </MenuItem>
+                          )}
+                          <MenuItem onClick={handleOpenWatchlistModal}>
                             <ListItemIcon>
-                              <Settings fontSize="small" />
+                              <BookmarkIcon fontSize="small" />
                             </ListItemIcon>
-                            Налаштування
+                            Список відстеження
                           </MenuItem>
                           <MenuItem onClick={logOut}>
                             <ListItemIcon>
