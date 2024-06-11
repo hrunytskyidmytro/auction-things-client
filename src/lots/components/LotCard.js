@@ -21,10 +21,9 @@ import {
   StyledCardActions,
 } from "../styles/cardStyles";
 import { useAuth } from "../../shared/hooks/useAuth";
-
+import { useNavigate } from "react-router-dom";
 import { Link as RouterLink } from "react-router-dom";
 import { format } from "date-fns";
-
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 
@@ -36,6 +35,7 @@ import {
 
 const LotCard = ({ lot, userSeller }) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [addToWatchlist, { error: errorAdd, isLoading: isLoadingAdd }] =
     useAddToWatchlistMutation();
   const [
@@ -94,7 +94,7 @@ const LotCard = ({ lot, userSeller }) => {
           subheader={format(new Date(lot?.createdAt), "dd.MM.yyyy")}
           action={
             userSeller && (
-              <IconButton aria-label="settings">
+              <IconButton aria-label="settings" onClick={() => navigate(`/seller/lots/${lot.id}`)}>
                 <EditTwoToneIcon />
               </IconButton>
             )

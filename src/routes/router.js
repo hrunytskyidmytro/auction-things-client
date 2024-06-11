@@ -45,7 +45,9 @@ import LotsPageByCategory from "../lots/pages/LotsPageByCategory";
 
 import LotsForBuyers from "../lots/pages/Lots";
 import LotDetail from "../lots/pages/LotDetail";
-import UserLots from "../user/pages/UserLots";
+import SellerLots from "../user/pages/SellerLots";
+import SellerNewLot from "../user/pages/SellerNewLot";
+import SellerUpdateLot from "../user/pages/SellerUpdateLot"
 
 import SellerWelcomePage from "../user/pages/SellerWelcomePage";
 
@@ -89,7 +91,15 @@ export const router = createBrowserRouter([
       },
       {
         path: "/seller/:id",
-        element: <UserLots />,
+        element: <SellerLots />,
+      },
+      {
+        path: "/seller/new",
+        element: <SellerNewLot />,
+      },
+      {
+        path: "/seller/lots/:id",
+        element: <SellerUpdateLot />,
       },
       {
         path: "welcome-seller",
@@ -133,17 +143,6 @@ export const router = createBrowserRouter([
           },
         ],
       },
-
-      // {
-      //   path: "seller",
-      //   element: <PrivateOutlet />,
-      //   children: [
-      //     {
-      //       path: "lots",
-      //       element: <Lots />,
-      //     },
-      //   ],
-      // }
     ],
   },
   {

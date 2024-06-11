@@ -15,6 +15,7 @@ import LotsSkeleton from "../components/LotsSkeleton";
 
 const LotsForBuyers = () => {
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10); 
   const [sortBy, setSortBy] = useState("");
   const [currentPriceRange, setCurrentPriceRange] = useState([0, 2000]);
   const [buyNowPriceRange, setBuyNowPriceRange] = useState([0, 2000]);
@@ -30,6 +31,7 @@ const LotsForBuyers = () => {
     error: lotsError,
   } = useGetAllLotsQuery({
     page,
+    limit,
     sortBy,
     currentPriceFrom: currentPriceRange[0],
     currentPriceTo: currentPriceRange[1],
