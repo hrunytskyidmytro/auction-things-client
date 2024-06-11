@@ -5,35 +5,27 @@ import {
   Grid,
   Typography,
   TextField,
-  Alert,
-  Snackbar,
   Avatar,
   Paper,
   CssBaseline,
-  createTheme,
-  ThemeProvider,
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-
 import { Formik, Field, Form } from "formik";
 import { validationSchemaRequestPasswordReset } from "../../shared/utils/validatorsSchemes";
 import { useRequestPasswordResetMutation } from "../../api/passwordResetApi";
-
-const defaultTheme = createTheme();
+import MessageSnackbar from "../../shared/components/UIElements/MessageSnackbar";
 
 const RequestPasswordReset = () => {
   const [openSuccessAlert, setOpenSuccessAlert] = useState(false);
   const [openErrorAlert, setOpenErrorAlert] = useState(false);
-
   const [successMessage, setSuccessMessage] = useState("");
-
   const [showCloseMessage, setShowCloseMessage] = useState(false);
 
   const [requestPasswordReset, { isLoading, error }] =
     useRequestPasswordResetMutation();
 
   return (
-    <ThemeProvider theme={defaultTheme}>
+    <>
       <Grid container component="main" sx={{ height: "100vh" }}>
         <CssBaseline />
         <Grid
@@ -119,47 +111,27 @@ const RequestPasswordReset = () => {
           </Box>
         </Grid>
       </Grid>
-      <Snackbar
+      <MessageSnackbar
         open={openSuccessAlert}
-        autoHideDuration={5000}
         onClose={() => setOpenSuccessAlert(false)}
-      >
-        <Alert
-          onClose={() => setOpenSuccessAlert(false)}
-          severity="success"
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {successMessage}
-        </Alert>
-      </Snackbar>
-      <Snackbar
+        severity="success"
+        message={successMessage}
+      />
+      <MessageSnackbar
         open={openErrorAlert}
-        autoHideDuration={5000}
         onClose={() => setOpenErrorAlert(false)}
-      >
-        <Alert
-          onClose={() => setOpenErrorAlert(false)}
-          severity="error"
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {error?.data?.message}
-        </Alert>
-      </Snackbar>
+        severity="error"
+        message={error?.data?.message}
+      />
       {showCloseMessage && (
-        <Snackbar open={showCloseMessage} autoHideDuration={null}>
-          <Alert
-            onClose={() => setShowCloseMessage(false)}
-            severity="info"
-            variant="filled"
-            sx={{ width: "100%" }}
-          >
-            Якщо все успішно, можете закрити цю вкладку.
-          </Alert>
-        </Snackbar>
+        <MessageSnackbar
+          open={showCloseMessage}
+          onClose={() => setShowCloseMessage(false)}
+          severity="info"
+          message={"Якщо все успішно, можете закрити цю вкладку."}
+        />
       )}
-    </ThemeProvider>
+    </>
   );
 };
 

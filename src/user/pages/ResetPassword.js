@@ -4,29 +4,22 @@ import {
   Box,
   TextField,
   Typography,
-  Alert,
-  Snackbar,
   Avatar,
   Grid,
   Paper,
   IconButton,
   InputAdornment,
-  createTheme,
-  ThemeProvider,
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-
 import { Formik, Form, Field } from "formik";
 import { validationSchemaResetPassword } from "../../shared/utils/validatorsSchemes";
 import { useResetPasswordMutation } from "../../api/passwordResetApi";
-
-const defaultTheme = createTheme();
+import MessageSnackbar from "../../shared/components/UIElements/MessageSnackbar";
 
 const ResetPassword = () => {
   const { token } = useParams();
-
   const [openErrorAlert, setOpenErrorAlert] = useState(false);
   const [openSuccessAlert, setOpenSuccessAlert] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -41,7 +34,7 @@ const ResetPassword = () => {
   };
 
   return (
-    <ThemeProvider theme={defaultTheme}>
+    <>
       <Grid
         container
         component="main"
@@ -168,36 +161,20 @@ const ResetPassword = () => {
           </Box>
         </Grid>
       </Grid>
-      <Snackbar
+      <MessageSnackbar
         open={openSuccessAlert}
-        autoHideDuration={6000}
         onClose={() => setOpenSuccessAlert(false)}
-      >
-        <Alert
-          onClose={() => setOpenSuccessAlert(false)}
-          severity="success"
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          Пароль успішно встановлено! Через 5 секунд Вас перекине на сторінку
-          авторизації.
-        </Alert>
-      </Snackbar>
-      <Snackbar
+        severity="success"
+        message="Пароль успішно встановлено! Через 5 секунд Вас перекине на сторінку
+          авторизації."
+      />
+      <MessageSnackbar
         open={openErrorAlert}
-        autoHideDuration={6000}
         onClose={() => setOpenErrorAlert(false)}
-      >
-        <Alert
-          onClose={() => setOpenErrorAlert(false)}
-          severity="error"
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {error?.data?.message}
-        </Alert>
-      </Snackbar>
-    </ThemeProvider>
+        severity="error"
+        message={error?.data?.message}
+      />
+    </>
   );
 };
 

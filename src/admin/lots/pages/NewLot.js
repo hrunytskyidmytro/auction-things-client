@@ -5,6 +5,7 @@ import {
   FormControl,
   InputAdornment,
   Box,
+  Typography,
   InputLabel,
   Select,
   MenuItem,
@@ -72,6 +73,10 @@ const NewLot = () => {
           alignItems: "center",
         }}
       >
+        <Typography variant="body2" textAlign={"center"}>
+          При редагуванні, зображення змінювати не можна. Намагайтеся зображення
+          встановлювати на початку.
+        </Typography>
         <Formik
           initialValues={{
             title: "",
@@ -92,7 +97,7 @@ const NewLot = () => {
               formData.append("description", description);
               formData.append("startingPrice", values.startingPrice);
               formData.append("endDate", values.endDate);
-              formData.append("status", "PENDING");
+              formData.append("status", "OPEN");
               formData.append("categoryId", values.categoryId);
               formData.append("buyNowPrice", values.buyNowPrice);
               formData.append("bidIncrement", values.bidIncrement);
@@ -167,9 +172,6 @@ const NewLot = () => {
                 editor={ClassicEditor}
                 config={{
                   language: "uk",
-                  ckfinder: {
-                    // uploadUrl: "http://localhost:3000/public",
-                  },
                 }}
                 data="Тут повинен бути опис до лоту (про товар)..."
                 onReady={(editor) => {

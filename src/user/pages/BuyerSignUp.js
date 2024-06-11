@@ -8,27 +8,19 @@ import {
   TextField,
   InputAdornment,
   IconButton,
-  Alert,
-  Snackbar,
-  createTheme,
-  ThemeProvider,
   Paper,
   CssBaseline,
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-
 import { Formik, Field, Form } from "formik";
 import { validationSchemaForBuyer } from "../../shared/utils/validatorsSchemes";
-
 import { useNavigate } from "react-router-dom";
 import { useCreateUserMutation } from "../../api/userApi";
-
-const defaultTheme = createTheme();
+import MessageSnackbar from "../../shared/components/UIElements/MessageSnackbar";
 
 const BuyerSignUp = () => {
   const [createUser, { isLoading, error }] = useCreateUserMutation();
@@ -36,7 +28,6 @@ const BuyerSignUp = () => {
 
   const [phoneNumber, setPhoneNumber] = useState("");
   const [role, setRole] = useState("");
-
   const [showPassword, setShowPassword] = useState(false);
   const [openErrorAlert, setOpenErrorAlert] = useState(false);
 
@@ -57,7 +48,7 @@ const BuyerSignUp = () => {
   };
 
   return (
-    <ThemeProvider theme={defaultTheme}>
+    <>
       <Grid container component="main" sx={{ height: "100vh" }}>
         <CssBaseline />
         <Grid
@@ -281,21 +272,13 @@ const BuyerSignUp = () => {
           </Box>
         </Grid>
       </Grid>
-      <Snackbar
+      <MessageSnackbar
         open={openErrorAlert}
-        autoHideDuration={5000}
         onClose={() => setOpenErrorAlert(false)}
-      >
-        <Alert
-          onClose={() => setOpenErrorAlert(false)}
-          severity="error"
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {error?.data?.message}
-        </Alert>
-      </Snackbar>
-    </ThemeProvider>
+        severity="error"
+        message={error?.data?.message}
+      />
+    </>
   );
 };
 
