@@ -76,7 +76,8 @@ const WithdrawFundsPage = () => {
         sm={4}
         md={7}
         sx={{
-          backgroundImage: "url(https://source.unsplash.com/random?wallpapers)",
+          backgroundImage:
+            "url(https://info.exmo.com/wp-content/uploads/2023/03/1000h503_uah.png)",
           backgroundRepeat: "no-repeat",
           backgroundColor: (t) =>
             t.palette.mode === "light"

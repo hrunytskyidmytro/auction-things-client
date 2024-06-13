@@ -58,7 +58,7 @@ const BuyerSignUp = () => {
           md={7}
           sx={{
             backgroundImage:
-              "url(https://source.unsplash.com/random?wallpapers)",
+              "url(https://seller.rozetka.com.ua/assets/images/landing/main.svg)",
             backgroundRepeat: "no-repeat",
             backgroundColor: (t) =>
               t.palette.mode === "light"
